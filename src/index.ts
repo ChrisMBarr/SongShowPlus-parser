@@ -1,4 +1,4 @@
-import { ISongShowPlusAttribute, ISongShowPlusSection, ISongShowPlusSong } from './models';
+import { ISongShowPlusSection, ISongShowPlusSong } from './models';
 import { TextCleaner } from './text-cleaner';
 
 export class SongShowPlus {
@@ -15,9 +15,11 @@ export class SongShowPlus {
       fileContent = fileContent.toString();
     }
 
-    let title = ''; //default/fallback name
+    let title = '';
+    let artist = '';
+    let copyright = '';
+    let ccli = '';
     let keywords: string[] = [];
-    let attributes: ISongShowPlusAttribute[] = [];
     let sections: ISongShowPlusSection[] = [];
 
     //We don't want any properties XML tags which can sometimes begin the file.
@@ -36,81 +38,78 @@ export class SongShowPlus {
 
         if (sectionParts[0] != null) {
           //The info is all contained in the first section, so only pass that in and pass in the keywords from above
-          const parsedInfo = this.getTitleAndInfo(sectionParts[0]);
+          const parsedInfo = this.getSongAttributes(sectionParts[0]);
           title = parsedInfo.title;
-          attributes = parsedInfo.info;
+          artist = parsedInfo.artist;
+          copyright = parsedInfo.copyright;
+          ccli = parsedInfo.ccli;
         }
       }
     }
 
     return {
       title,
+      artist,
+      copyright,
+      ccli,
       keywords,
-      attributes,
       sections,
     };
   }
 
-  private getTitleAndInfo(firstSection: string): { title: string; info: ISongShowPlusAttribute[] } {
+  private getSongAttributes(firstSection: string): {
+    title: string;
+    artist: string;
+    copyright: string;
+    ccli: string;
+  } {
     //Split the info up into an array by the invisible characters
     //Then remove all empty items and items that are only 1 character long
     const infoArray = firstSection
       .split(this.patternInvisibleChars)
       .filter((n) => n.trim().replace(/\r\n\t/g, '').length > 1);
 
-    let songTitle = ''; //Fallback title
+    let title = '';
+    let artist = '';
+    let copyright = '';
+    let ccli = '';
 
-    if (infoArray.length > 0 && infoArray[0] != null) {
-      //If the first items is a number between 1 and 4 digits, remove it
-      if (/[0-9]{1,4}/.test(infoArray[0])) {
-        infoArray.splice(0, 1);
+    if (infoArray.length > 0) {
+      if (infoArray[0] != null) {
+        //If the first items is a number between 1 and 4 digits, remove it
+        if (/[0-9]{1,4}/.test(infoArray[0])) {
+          infoArray.splice(0, 1);
+        }
+
+        //Remove dollar signs from the title
+        title = infoArray[0].replace(/\$/g, '');
+      }
+      if (infoArray[1] != null) {
+        artist = this.textCleaner.convertWin1252ToUtf8(infoArray[1].trim());
       }
 
-      //Remove dollar signs from the title
-      songTitle = infoArray[0].replace(/\$/g, '');
+      //If the copyright exists, add it
+      if (infoArray[2] != null) {
+        //copyright info tends to end with a $ sign, so remove it
+        copyright = this.textCleaner.convertWin1252ToUtf8(infoArray[2].replace('$', '').trim());
+      }
+
+      //If the CCLI exists, add it
+      if (infoArray[3] != null) {
+        ccli = this.textCleaner.convertWin1252ToUtf8(infoArray[3].trim());
+      }
     }
 
     //Convert characters as needed - useful for non-UTF8 character (like accented characters in Spanish)
     //This is partially needed due to the binary file format that we are scraping for text
-    songTitle = this.textCleaner.convertWin1252ToUtf8(songTitle);
+    title = this.textCleaner.convertWin1252ToUtf8(title);
 
     return {
-      info: this.getSongAttributes(infoArray),
-      title: songTitle,
+      title,
+      artist,
+      copyright,
+      ccli,
     };
-  }
-
-  private getSongAttributes(infoArray: string[]): ISongShowPlusAttribute[] {
-    const songInfo = [];
-
-    if (infoArray[1] != null) {
-      songInfo.push({
-        name: 'Artist/Author',
-        value: infoArray[1].trim(),
-      });
-    }
-
-    //If the copyright exists, add it
-    if (infoArray[2] != null) {
-      songInfo.push({
-        name: 'Copyright',
-        value: infoArray[2].replace('$', '').trim(), //copyright info tends to end with a $ sign, so remove it
-      });
-    }
-
-    //If the CCLI exists, add it
-    if (infoArray[3] != null) {
-      songInfo.push({
-        name: 'CCLI',
-        value: infoArray[3].trim(),
-      });
-    }
-
-    for (const info of songInfo) {
-      info.value = this.textCleaner.convertWin1252ToUtf8(info.value);
-    }
-
-    return songInfo;
   }
 
   private cleanOddCharsFromSectionTitles(lyrics: string): string {

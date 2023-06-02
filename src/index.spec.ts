@@ -18,11 +18,9 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Be Near',
       keywords: ['Longing', "Security'"],
-      attributes: [
-        { name: 'Artist/Author', value: 'Barnard, Shane' },
-        { name: 'Copyright', value: '2003 Waiting Room Music' },
-        { name: 'CCLI', value: '4090362' },
-      ],
+      artist: 'Barnard, Shane',
+      copyright: '2003 Waiting Room Music',
+      ccli: '4090362',
       sections: [
         {
           title: 'Chorus 1',
@@ -63,20 +61,9 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Give Us Clean Hands',
       keywords: ['Prayer', 'Repentance'],
-      attributes: [
-        {
-          name: 'Artist/Author',
-          value: 'Hall, Charlie',
-        },
-        {
-          name: 'Copyright',
-          value: '2000 worshiptogether.com songs',
-        },
-        {
-          name: 'CCLI',
-          value: '2060208',
-        },
-      ],
+      artist: 'Hall, Charlie',
+      copyright: '2000 worshiptogether.com songs',
+      ccli: '2060208',
       sections: [
         {
           title: 'Chorus 1',
@@ -103,16 +90,9 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Jesus Saves (2)',
       keywords: [],
-      attributes: [
-        {
-          name: 'Artist/Author',
-          value: 'Eddie James',
-        },
-        {
-          name: 'Copyright',
-          value: '© Fresh Wine Publishing',
-        },
-      ],
+      artist: 'Eddie James',
+      copyright: '© Fresh Wine Publishing',
+      ccli: '',
       sections: [
         {
           title: 'Verse 1',
@@ -163,20 +143,9 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       title: 'You Are (2)',
       keywords: ['Appreciation', 'Breakthrough', 'Christ', 'Declaration', "Jesus'"],
-      attributes: [
-        {
-          name: 'Artist/Author',
-          value: '8Jobe, Caleb | Cohen, Ezra | Hesami, Josh | Trimble, Paul',
-        },
-        {
-          name: 'Copyright',
-          value: '2010 CFN Music',
-        },
-        {
-          name: 'CCLI',
-          value: '5715921',
-        },
-      ],
+      artist: '8Jobe, Caleb | Cohen, Ezra | Hesami, Josh | Trimble, Paul',
+      copyright: '2010 CFN Music',
+      ccli: '5715921',
       sections: [
         {
           title: 'Verse 1',
@@ -208,7 +177,9 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Devuelveme El Gozo',
       keywords: ['Tahoma', '�?'],
-      attributes: [],
+      artist: '',
+      copyright: '',
+      ccli: '',
       sections: [
         {
           title: 'Verse 1',
@@ -230,7 +201,9 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       title: 'La Sangre (The Blood)',
       keywords: ['Background Improv'],
-      attributes: [],
+      artist: '',
+      copyright: '',
+      ccli: '',
       sections: [
         {
           title: 'Verse 1',
