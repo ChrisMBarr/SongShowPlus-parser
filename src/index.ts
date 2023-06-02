@@ -10,7 +10,11 @@ export class SongShowPlus {
 
   private readonly textCleaner = new TextCleaner();
 
-  parse(fileContent: string): ISongShowPlusSong {
+  parse(fileContent: string | Buffer): ISongShowPlusSong {
+    if (fileContent instanceof Buffer) {
+      fileContent = fileContent.toString();
+    }
+
     let title = ''; //default/fallback name
     let attributes: ISongShowPlusAttribute[] = [];
     let sections: ISongShowPlusSection[] = [];
