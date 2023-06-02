@@ -17,7 +17,7 @@ import { SongShowPlus } from 'songshowplus-parser';
 
 const sspParser = new SongShowPlus();
 
-readFile('my-song.sbsong', (contents) => {
+readFile('Be Near.sbsong', (contents) => {
   const song = sspParser.parse(contents);
   console.log(song);
 });
@@ -30,10 +30,52 @@ const { SongShowPlus } = require('songshowplus-parser');
 
 const sspParser = new SongShowPlus();
 
-fs.readFile('my-song.sbsong', (contents) => {
+fs.readFile('Be Near.sbsong', (contents) => {
   const song = sspParser.parse(contents);
   console.log(song);
 });
+```
+
+## Example Output
+```
+{
+  title: 'Be Near',
+  keywords: ['Longing', "Security'"],
+  artist: 'Barnard, Shane',
+  copyright: '2003 Waiting Room Music',
+  ccli: '4090362',
+  sections: [
+    {
+      title: 'Chorus 1',
+      lyrics:
+        'Be near O God\r\nBe near O God of us\r\nYour nearness is to us our good\r\nBe near O God\r\nBe near O God of us\r\nYour nearness is to us our good\r\nOur good',
+    },
+    {
+      title: 'Verse 1',
+      lyrics:
+        "You are all big and small\r\nBeautiful\r\nAnd wonderful\r\nTo trust in grace through faith\r\nBut I'm asking to taste",
+    },
+    {
+      title: 'Verse 2',
+      lyrics:
+        'For dark is light to You\r\nDepths are height to You\r\nFar is near\r\nBut Lord I need to hear from You',
+    },
+    {
+      title: 'Verse 3',
+      lyrics:
+        'Your fullness is mine\r\nRevelation divine\r\nBut oh to taste\r\nTo know much more than a page\r\nTo feel Your embrace',
+    },
+    {
+      title: 'Verse 4',
+      lyrics:
+        'For dark is light to You\r\nDepths are height to You\r\nFar is near\r\nBut Lord I need to hear from You',
+    },
+    {
+      title: 'Ending',
+      lyrics: 'My good',
+    },
+  ],
+}
 ```
 
 ## Notes
