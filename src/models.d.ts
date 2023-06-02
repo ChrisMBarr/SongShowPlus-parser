@@ -1,5 +1,6 @@
 export interface ISongShowPlusSong {
   title: string;
+  keywords: string[];
   attributes: ISongShowPlusAttribute[];
   sections: ISongShowPlusSection[];
 }

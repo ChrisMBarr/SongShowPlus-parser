@@ -16,6 +16,7 @@ export class SongShowPlus {
     }
 
     let title = ''; //default/fallback name
+    let keywords: string[] = [];
     let attributes: ISongShowPlusAttribute[] = [];
     let sections: ISongShowPlusSection[] = [];
 
@@ -30,11 +31,12 @@ export class SongShowPlus {
         //Pass all the sections in here to get the lyrics
         //We will get out the sections and the keywords
         const sectionContent = this.getSectionsAndKeywords(sectionParts);
+        keywords = sectionContent.keywords;
         sections = sectionContent.sections;
 
         if (sectionParts[0] != null) {
           //The info is all contained in the first section, so only pass that in and pass in the keywords from above
-          const parsedInfo = this.getTitleAndInfo(sectionParts[0], sectionContent.keywords);
+          const parsedInfo = this.getTitleAndInfo(sectionParts[0]);
           title = parsedInfo.title;
           attributes = parsedInfo.info;
         }
@@ -43,15 +45,13 @@ export class SongShowPlus {
 
     return {
       title,
+      keywords,
       attributes,
       sections,
     };
   }
 
-  private getTitleAndInfo(
-    firstSection: string,
-    keywords: string
-  ): { title: string; info: ISongShowPlusAttribute[] } {
+  private getTitleAndInfo(firstSection: string): { title: string; info: ISongShowPlusAttribute[] } {
     //Split the info up into an array by the invisible characters
     //Then remove all empty items and items that are only 1 character long
     const infoArray = firstSection
@@ -75,12 +75,12 @@ export class SongShowPlus {
     songTitle = this.textCleaner.convertWin1252ToUtf8(songTitle);
 
     return {
-      info: this.getSongAttributes(infoArray, keywords),
+      info: this.getSongAttributes(infoArray),
       title: songTitle,
     };
   }
 
-  private getSongAttributes(infoArray: string[], keywords: string): ISongShowPlusAttribute[] {
+  private getSongAttributes(infoArray: string[]): ISongShowPlusAttribute[] {
     const songInfo = [];
 
     if (infoArray[1] != null) {
@@ -103,14 +103,6 @@ export class SongShowPlus {
       songInfo.push({
         name: 'CCLI',
         value: infoArray[3].trim(),
-      });
-    }
-
-    //If we have keywords, add them
-    if (keywords) {
-      songInfo.push({
-        name: 'Keywords',
-        value: keywords.trim(),
       });
     }
 
@@ -205,13 +197,13 @@ export class SongShowPlus {
 
   private getSectionsAndKeywords(sections: string[]): {
     sections: ISongShowPlusSection[];
-    keywords: string;
+    keywords: string[];
   } {
     const sectionsArray = this.createInitialSectionsArray(sections);
 
     //The last section also contains the keywords, we need to parse these out separately
     const lastSectionObj = this.getKeywordsFromLastSection(sections.slice(-1)[0]);
-    let keywords = '';
+    let keywords: string[] = [];
     if (lastSectionObj.lastLyrics !== '') {
       //If we have no sections, and what we think are keywords are longer than the lyrics...
       //Then we might need to switch them for some reason...
@@ -219,11 +211,11 @@ export class SongShowPlus {
         sectionsArray.length === 0 &&
         lastSectionObj.keywords.length > lastSectionObj.lastLyrics.length
       ) {
-        keywords = lastSectionObj.lastLyrics;
+        keywords = [lastSectionObj.lastLyrics];
 
         sectionsArray.push({
           title: '',
-          lyrics: lastSectionObj.keywords.replace(/\/+/g, ''),
+          lyrics: lastSectionObj.keywords.join('').replace(/\/+/g, ''),
         });
       } else {
         keywords = lastSectionObj.keywords;
@@ -254,10 +246,10 @@ export class SongShowPlus {
   }
 
   private getKeywordsFromLastSection(lastSectionRaw: string | undefined): {
-    keywords: string;
+    keywords: string[];
     lastLyrics: string;
   } {
-    let keywords = '';
+    let keywords: string[] = [];
     let lastLyrics = '';
 
     if (lastSectionRaw != null) {
@@ -271,8 +263,7 @@ export class SongShowPlus {
         //The keywords are the entire array except for the first two items
         keywords = infoArray
           .splice(2)
-          .map((x) => x.replace(/[\r\n\t]*/g, ''))
-          .join(` | `);
+          .map((x) => this.textCleaner.convertWin1252ToUtf8(x.replace(/[\r\n\t]*/g, '')));
 
         if (infoArray.length > 0 && infoArray[1] != null) {
           //Return the last section minus the keywords, then parse out the optional beginning non-word character
@@ -284,7 +275,6 @@ export class SongShowPlus {
         }
 
         //Convert characters as needed - useful for non-english alphabets (Spanish)
-        keywords = this.textCleaner.convertWin1252ToUtf8(keywords);
         lastLyrics = this.cleanOddCharsFromSectionLyrics(lastLyrics);
       }
     }

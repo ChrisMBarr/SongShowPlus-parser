@@ -17,11 +17,11 @@ describe('SongShowPlus', (): void => {
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Be Near',
+      keywords: ['Longing', "Security'"],
       attributes: [
         { name: 'Artist/Author', value: 'Barnard, Shane' },
         { name: 'Copyright', value: '2003 Waiting Room Music' },
         { name: 'CCLI', value: '4090362' },
-        { name: 'Keywords', value: "Longing | Security'" },
       ],
       sections: [
         {
@@ -62,6 +62,7 @@ describe('SongShowPlus', (): void => {
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Give Us Clean Hands',
+      keywords: ['Prayer', 'Repentance'],
       attributes: [
         {
           name: 'Artist/Author',
@@ -74,10 +75,6 @@ describe('SongShowPlus', (): void => {
         {
           name: 'CCLI',
           value: '2060208',
-        },
-        {
-          name: 'Keywords',
-          value: 'Prayer | Repentance',
         },
       ],
       sections: [
@@ -105,6 +102,7 @@ describe('SongShowPlus', (): void => {
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Jesus Saves (2)',
+      keywords: [],
       attributes: [
         {
           name: 'Artist/Author',
@@ -164,6 +162,7 @@ describe('SongShowPlus', (): void => {
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'You Are (2)',
+      keywords: ['Appreciation', 'Breakthrough', 'Christ', 'Declaration', "Jesus'"],
       attributes: [
         {
           name: 'Artist/Author',
@@ -176,10 +175,6 @@ describe('SongShowPlus', (): void => {
         {
           name: 'CCLI',
           value: '5715921',
-        },
-        {
-          name: 'Keywords',
-          value: "Appreciation | Breakthrough | Christ | Declaration | Jesus'",
         },
       ],
       sections: [
@@ -212,12 +207,8 @@ describe('SongShowPlus', (): void => {
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Devuelveme El Gozo',
-      attributes: [
-        {
-          name: 'Keywords',
-          value: 'Tahoma | �?',
-        },
-      ],
+      keywords: ['Tahoma', '�?'],
+      attributes: [],
       sections: [
         {
           title: 'Verse 1',
@@ -238,12 +229,8 @@ describe('SongShowPlus', (): void => {
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'La Sangre (The Blood)',
-      attributes: [
-        {
-          name: 'Keywords',
-          value: 'Background Improv',
-        },
-      ],
+      keywords: ['Background Improv'],
+      attributes: [],
       sections: [
         {
           title: 'Verse 1',
