@@ -1,7 +1,7 @@
-import { SongShowPlusParser } from '.';
+import { SongShowPlus } from '.';
 
 describe('SongShowPlusParser', (): void => {
   it('should exist', () => {
-    expect(SongShowPlusParser).toBeDefined();
+    expect(SongShowPlus).toBeDefined();
   });
 });
