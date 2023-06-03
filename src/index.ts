@@ -26,7 +26,7 @@ export class SongShowPlus {
     //Splitting these out and then taking the first array item can prevent this.
     //Each song sections seems to be split up by a percent sign, so make an array by splitting on that
     const propSections = fileContent.split('<Properties>');
-    if (propSections[0] != null) {
+    if (propSections[0]) {
       const sectionParts = propSections[0].split('%');
 
       if (sectionParts.length > 0) {
@@ -36,7 +36,7 @@ export class SongShowPlus {
         keywords = sectionContent.keywords;
         sections = sectionContent.sections;
 
-        if (sectionParts[0] != null) {
+        if (sectionParts[0]) {
           //The info is all contained in the first section, so only pass that in and pass in the keywords from above
           const parsedInfo = this.getSongAttributes(sectionParts[0]);
           title = parsedInfo.title;
@@ -75,7 +75,7 @@ export class SongShowPlus {
     let ccli = '';
 
     if (infoArray.length > 0) {
-      if (infoArray[0] != null) {
+      if (infoArray[0]) {
         //If the first items is a number between 1 and 4 digits, remove it
         if (/[0-9]{1,4}/.test(infoArray[0])) {
           infoArray.splice(0, 1);
@@ -84,18 +84,18 @@ export class SongShowPlus {
         //Remove dollar signs from the title
         title = infoArray[0].replace(/\$/g, '');
       }
-      if (infoArray[1] != null) {
+      if (infoArray[1]) {
         artist = this.textCleaner.convertWin1252ToUtf8(infoArray[1].trim());
       }
 
       //If the copyright exists, add it
-      if (infoArray[2] != null) {
+      if (infoArray[2]) {
         //copyright info tends to end with a $ sign, so remove it
         copyright = this.textCleaner.convertWin1252ToUtf8(infoArray[2].replace('$', '').trim());
       }
 
       //If the CCLI exists, add it
-      if (infoArray[3] != null) {
+      if (infoArray[3]) {
         ccli = this.textCleaner.convertWin1252ToUtf8(infoArray[3].trim());
       }
     }
@@ -170,10 +170,10 @@ export class SongShowPlus {
 
       //Remove whitespace from the title
       if (matches != null) {
-        if (matches[1] != null) {
+        if (matches[1]) {
           sectionTitle = matches[1].replace(this.patternInvisibleChars, '').trim();
         }
-        if (matches[2] != null) {
+        if (matches[2]) {
           //Remove any more invisible chars from the lyrics and remove whitespace
           sectionLyrics = matches[2].replace(this.patternInvisibleChars, '').trim();
         }
@@ -264,7 +264,7 @@ export class SongShowPlus {
           .splice(2)
           .map((x) => this.textCleaner.convertWin1252ToUtf8(x.replace(/[\r\n\t]*/g, '')));
 
-        if (infoArray.length > 0 && infoArray[1] != null) {
+        if (infoArray.length > 0 && infoArray[1]) {
           //Return the last section minus the keywords, then parse out the optional beginning non-word character
           const lastSectionNonWordsRemoved = /^\W*([\s\S]+)/m.exec(infoArray[1]);
 
