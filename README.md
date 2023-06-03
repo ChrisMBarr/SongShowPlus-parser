@@ -9,8 +9,9 @@ npm install songshowplus-parser --save
 ```
 
 ## Usage
+Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP7 file as a string to the `.parse()` method.
 
-TypeScript projects
+### For TypeScript projects
 ```
 import {readFile} from 'fs';
 import { SongShowPlus } from 'songshowplus-parser';
@@ -18,12 +19,12 @@ import { SongShowPlus } from 'songshowplus-parser';
 const sspParser = new SongShowPlus();
 
 readFile('Be Near.sbsong', (contents) => {
-  const song = sspParser.parse(contents);
+  const song = sspParser.parse(contents.toString());
   console.log(song);
 });
 ```
 
-JavaScript projects
+### For JavaScript projects
 ```
 const fs = require('fs');
 const { SongShowPlus } = require('songshowplus-parser');
@@ -31,7 +32,7 @@ const { SongShowPlus } = require('songshowplus-parser');
 const sspParser = new SongShowPlus();
 
 fs.readFile('Be Near.sbsong', (contents) => {
-  const song = sspParser.parse(contents);
+  const song = sspParser.parse(contents.toString());
   console.log(song);
 });
 ```

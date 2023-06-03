@@ -27,6 +27,7 @@
     "dist/module",
     "!**/*.spec.*",
     "!**/*.json",
+    "!**/*.tsbuildinfo*",
     "LICENSE",
     "README.md"
   ],

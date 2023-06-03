@@ -13,7 +13,7 @@ describe('SongShowPlus', (): void => {
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "Be Near.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/Be Near.sbsong');
+    const testFile = readFileSync('./sample-files/Be Near.sbsong').toString();
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Be Near',
@@ -56,7 +56,7 @@ describe('SongShowPlus', (): void => {
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "Give Us Clean Hands.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/Give Us Clean Hands.sbsong');
+    const testFile = readFileSync('./sample-files/Give Us Clean Hands.sbsong').toString();
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Give Us Clean Hands',
@@ -85,7 +85,7 @@ describe('SongShowPlus', (): void => {
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "Jesus Saves.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/Jesus Saves.sbsong');
+    const testFile = readFileSync('./sample-files/Jesus Saves.sbsong').toString();
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Jesus Saves (2)',
@@ -138,7 +138,7 @@ describe('SongShowPlus', (): void => {
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "You Are.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/You Are.sbsong');
+    const testFile = readFileSync('./sample-files/You Are.sbsong').toString();
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'You Are (2)',
@@ -172,7 +172,7 @@ describe('SongShowPlus', (): void => {
   });
 
   it('should return a song for a SPANISH SongShow Plus 7 file: "Devuelveme El Gozo.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/Devuelveme El Gozo.sbsong');
+    const testFile = readFileSync('./sample-files/Devuelveme El Gozo.sbsong').toString();
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'Devuelveme El Gozo',
@@ -196,7 +196,7 @@ describe('SongShowPlus', (): void => {
   });
 
   it('should return a song for a SPANISH SongShow Plus 7 file: "La Sangre (The Blood).sbsong"', () => {
-    const testFile = readFileSync('./sample-files/La Sangre (The Blood).sbsong');
+    const testFile = readFileSync('./sample-files/La Sangre (The Blood).sbsong').toString();
 
     expect(sspParser.parse(testFile)).toEqual({
       title: 'La Sangre (The Blood)',
