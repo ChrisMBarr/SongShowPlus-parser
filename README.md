@@ -4,7 +4,7 @@ Currently only tested with SongShow Plus 7. I need test files from newer version
 
 ## Installation
 
-```
+```cli
 npm install songshowplus-parser --save
 ```
 
@@ -12,7 +12,7 @@ npm install songshowplus-parser --save
 Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP7 file as a string to the `.parse()` method.
 
 ### For TypeScript projects
-```
+```typescript
 import {readFile} from 'fs';
 import { SongShowPlus } from 'songshowplus-parser';
 
@@ -25,7 +25,7 @@ readFile('Be Near.sbsong', (contents) => {
 ```
 
 ### For JavaScript projects
-```
+```javascript
 const fs = require('fs');
 const { SongShowPlus } = require('songshowplus-parser');
 
@@ -38,7 +38,7 @@ fs.readFile('Be Near.sbsong', (contents) => {
 ```
 
 ## Example Output
-```
+```javascript
 {
   title: 'Be Near',
   keywords: ['Longing', "Security'"],
