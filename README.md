@@ -18,11 +18,12 @@ Simply import and create a new instance of `SongShowPlus`, then pass the content
 ```typescript
 import { readFile } from 'fs';
 import { SongShowPlus } from 'songshowplus-parser';
+import { ISongShowPlusSong } from 'songshowplus-parser/dist/main/model';
 
 const sspParser = new SongShowPlus();
 
 readFile('Be Near.sbsong', (contents): void => {
-  const song = sspParser.parse(contents.toString());
+  const song: ISongShowPlusSong = sspParser.parse(contents.toString());
   console.log(song);
 });
 ```
