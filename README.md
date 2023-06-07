@@ -1,3 +1,5 @@
+[![GitHub - release](https://img.shields.io/github/v/release/FiniteLooper/SongShowPlus-parser?style=flat)](https://github.com/FiniteLooper/SongShowPlus-parser/releases/latest)
+
 # SongShowPlus-parser
 [SongShow Plus](https://www.songshowplus.com/) is a worship presentation software package use by many churches to present song lyrics (and many other things) on screens. When moving to a different software package it may be needed to get your song lyrics out into some other format.
 
