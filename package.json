@@ -38,40 +38,60 @@
   },
   "license": "MIT",
   "jest": {
-    "moduleDirectories": ["<rootDir>/../", "node_modules"],
-    "moduleFileExtensions": ["js", "json", "ts"],
+    "moduleDirectories": [
+      "<rootDir>/../",
+      "node_modules"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
     "preset": "ts-jest",
+    "reporters": [
+      "default",
+      "jest-html-reporter"
+    ],
     "rootDir": "./src",
     "testEnvironment": "node",
     "transform": {
       "^.+\\.ts$": [
         "ts-jest",
-        { "tsconfig": "tsconfig.json" }
+        {
+          "tsconfig": "tsconfig.json"
+        }
       ]
     }
   },
+  "jest-html-reporter": {
+    "includeConsoleLog": true,
+    "includeFailureMsg": true,
+    "includeStackTrace": false
+  },
   "scripts": {
-    "build": "npm run lint && npm run test:coverage && npm run build:main && npm run build:module",
+    "build": "npm run clean && npm run lint && npm run test:coverage && npm run build:main && npm run build:module",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
+    "clean": "rimraf dist coverage test-report.html",
     "lint": "eslint --fix src/**/*.ts",
-
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-
+    "test": "jest --reporters=default",
+    "test:coverage": "jest --coverage --coverageDirectory=../coverage",
+    "test:html": "jest --reporters=jest-html-reporter --verbose=false",
     "watch:build": "tsc -p tsconfig.json -w",
-    "watch:test": "jest --watch"
+    "watch:test": "jest --watch --reporters=default",
+    "watch:test:html": "jest --watch --reporters=jest-html-reporter --verbose=false"
   },
   "devDependencies": {
     "@types/jest": "^29.5.2",
-    "@types/node": "^20.2.5",
-    "@typescript-eslint/eslint-plugin": "^5.59.8",
-    "@typescript-eslint/parser": "^5.59.8",
-    "eslint": "^8.41.0",
+    "@types/node": "^20.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
+    "eslint": "^8.42.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-functional": "^5.0.8",
     "eslint-plugin-import": "^2.27.5",
     "jest": "^29.5.0",
+    "jest-html-reporter": "^3.10.0",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
