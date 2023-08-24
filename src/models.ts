@@ -1,12 +1,14 @@
 export interface ISongShowPlusSong {
+  songNumber: string;
   title: string;
   artist: string;
   copyright: string;
   ccli: string;
+  key: string;
   keywords: string[];
-  sections: ISongShowPlusSection[];
+  lyricSections: ISongShowPlusLyricSection[];
 }
-export interface ISongShowPlusSection {
+export interface ISongShowPlusLyricSection {
   title: string;
   lyrics: string;
 }

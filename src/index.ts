@@ -1,282 +1,308 @@
-import { ISongShowPlusSection, ISongShowPlusSong } from './models';
-import { TextCleaner } from './text-cleaner';
+/* eslint-disable no-unused-vars */
+import { ISongShowPlusLyricSection, ISongShowPlusSong } from './models';
+
+enum Block {
+  TITLE = 1,
+  AUTHOR = 2,
+  COPYRIGHT = 3,
+  CCLI_NO = 5,
+  KEY = 11,
+  VERSE = 12,
+  CHORUS = 20,
+  BRIDGE = 24,
+  TOPIC = 29,
+  COMMENTS = 30,
+  VERSE_ORDER = 31,
+  SONG_BOOK = 35,
+  SONG_NUMBER = 36,
+  CUSTOM_VERSE = 37,
+  FILE_START = 38,
+}
+
+interface ISongSectionBufferInfo {
+  type: Block;
+  nextBlockStart: number;
+  numBytesFollows: number;
+  thisBlockLength: number;
+  newByteOffset: number;
+}
+
+interface ISongSection {
+  type: Block;
+  value: string;
+  lyricContent?: string;
+}
 
 export class SongShowPlus {
-  //Regex pattern AS A STRING to match invisible control characters
-  //Slashes are double escaped here so it can be in a string!
-  private readonly patternInvisibleCharsStr = '[\\xA0\\x00-\\x09\\x0B\\x0C\\x0E-\\x1F\\x7F]';
-  //Same pattern, but as a real RexExp object
-  private readonly patternInvisibleChars = new RegExp(this.patternInvisibleCharsStr, 'g');
+  parse(fileBuffer: Buffer): ISongShowPlusSong {
+    const sections = this.getSections(fileBuffer);
 
-  private readonly textCleaner = new TextCleaner();
-
-  parse(fileContent: string): ISongShowPlusSong {
+    let songNumber = '';
     let title = '';
     let artist = '';
     let copyright = '';
     let ccli = '';
-    let keywords: string[] = [];
-    let sections: ISongShowPlusSection[] = [];
+    let key = '';
+    const keywords: string[] = [];
+    const lyricSections: ISongShowPlusLyricSection[] = [];
 
-    //We don't want any properties XML tags which can sometimes begin the file.
-    //Splitting these out and then taking the first array item can prevent this.
-    //Each song sections seems to be split up by a percent sign, so make an array by splitting on that
-    const propSections = fileContent.split('<Properties>');
-    if (propSections[0]) {
-      const sectionParts = propSections[0].split('%');
-
-      if (sectionParts.length > 0) {
-        //Pass all the sections in here to get the lyrics
-        //We will get out the sections and the keywords
-        const sectionContent = this.getSectionsAndKeywords(sectionParts);
-        keywords = sectionContent.keywords;
-        sections = sectionContent.sections;
-
-        if (sectionParts[0]) {
-          //The info is all contained in the first section, so only pass that in and pass in the keywords from above
-          const parsedInfo = this.getSongAttributes(sectionParts[0]);
-          title = parsedInfo.title;
-          artist = parsedInfo.artist;
-          copyright = parsedInfo.copyright;
-          ccli = parsedInfo.ccli;
-        }
-      }
-    }
-
-    return {
+    const returnObj: ISongShowPlusSong = {
+      songNumber,
       title,
       artist,
       copyright,
       ccli,
+      key,
       keywords,
-      sections,
+      lyricSections,
     };
+
+    // console.log(returnObj);
+
+    return returnObj;
   }
 
-  private getSongAttributes(firstSection: string): {
-    title: string;
-    artist: string;
-    copyright: string;
-    ccli: string;
-  } {
-    //Split the info up into an array by the invisible characters
-    //Then remove all empty items and items that are only 1 character long
-    const infoArray = firstSection
-      .split(this.patternInvisibleChars)
-      .filter((n) => n.trim().replace(/\r\n\t/g, '').length > 1);
+  //------------------------------------------
+  //File Parsing
+  /**
+   * @description Splits up the file by the separators and returns each section as an array of character code numbers
+   */
+  private getSections(fileBuffer: Buffer): Array<ISongSection> {
+    /*
+    The SongShow Plus song file format is as follows:
 
-    let title = '';
-    let artist = '';
-    let copyright = '';
-    let ccli = '';
+    * Each piece of data in the song file has some information that precedes it.
+    * The general format of this data is as follows:
+        | 4 Bytes, forming a 32 bit number, a key if you will, this describes what the data is (see Block Enum)
+        | 4 Bytes, forming a 32 bit number, which is the number of bytes until the next block starts
+        | 1 Byte, which tells how many bytes follows
+        | 1 or 4 Bytes, describes how long the string is, if its 1 byte, the string is less than 255
+        | The next bytes are the actual data.
+        | The next block of data follows on.
+    */
 
-    if (infoArray.length > 0) {
-      if (infoArray[0]) {
-        //If the first items is a number between 1 and 4 digits, remove it
-        if (/[0-9]{1,4}/.test(infoArray[0])) {
-          infoArray.splice(0, 1);
-        }
+    let byteOffset = 0;
+    const sections: Array<ISongSection> = [];
 
-        //Remove dollar signs from the title
-        title = infoArray[0].replace(/\$/g, '');
-      }
-      if (infoArray[1]) {
-        artist = this.textCleaner.convertWin1252ToUtf8(infoArray[1].trim());
-      }
-
-      //If the copyright exists, add it
-      if (infoArray[2]) {
-        //copyright info tends to end with a $ sign, so remove it
-        copyright = this.textCleaner.convertWin1252ToUtf8(infoArray[2].replace('$', '').trim());
-      }
-
-      //If the CCLI exists, add it
-      if (infoArray[3]) {
-        ccli = this.textCleaner.convertWin1252ToUtf8(infoArray[3].trim());
-      }
-    }
-
-    //Convert characters as needed - useful for non-UTF8 character (like accented characters in Spanish)
-    //This is partially needed due to the binary file format that we are scraping for text
-    title = this.textCleaner.convertWin1252ToUtf8(title);
-
-    return {
-      title,
-      artist,
-      copyright,
-      ccli,
-    };
-  }
-
-  private cleanOddCharsFromSectionTitles(lyrics: string): string {
-    //Convert character encodings - useful for non-English alphabets (Spanish)
-    return (
-      this.textCleaner
-        .convertWin1252ToUtf8(lyrics)
-        //Sometime section titles will end with an odd character
-        //If the last character isn't a letter, number, or closing parenthesis then remove it
-        .replace(/[^a-z0-9)]$/i, '')
+    //Convert Node Buffer to an array buffer
+    //https://stackoverflow.com/a/71211814/79677
+    const arrayBuffer = fileBuffer.buffer.slice(
+      fileBuffer.byteOffset,
+      fileBuffer.byteOffset + fileBuffer.byteLength
     );
-  }
+    const dataView = new DataView(arrayBuffer);
 
-  private cleanOddCharsFromSectionLyrics(lyrics: string): string {
-    return (
-      //Convert character encodings - useful for non-English alphabets (Spanish)
-      this.textCleaner
-        .convertWin1252ToUtf8(lyrics)
-        //Replace multiple slashes sometimes?
-        //Also remove some strange ugly characters...
-        .replace(/\/+|¶/g, '')
-        //remove beginning/ending whitespace
-        .trim()
-        //Sometimes the first character of lyrics is a random lowercase letter
-        //If we have a lowercase letter first and then an uppercase letter, remove that first character
-        .replace(/^[a-z]([A-Z])/, '$1')
-        //If the last characters are newlines followed by a non-letter character, remove them
-        .replace(/[\n\r]+[^a-z]$/i, '')
-    );
-  }
+    console.log('===============================================================');
+    // Loop through the buffer and read bytes based on the context
+    while (byteOffset < fileBuffer.byteLength) {
+      const sectionInfo = this.getSectionInfo(dataView.buffer, byteOffset);
+      byteOffset = sectionInfo.newByteOffset;
 
-  private createInitialSectionsArray(sections: string[]): ISongShowPlusSection[] {
-    const sectionsArray = [];
+      const dataArr = dataView.buffer.slice(byteOffset, byteOffset + sectionInfo.thisBlockLength);
+      const sectionContent = this.processCharsAsString(dataArr);
 
-    //Sections tend to begin with N number of control characters, a random print character,
-    // more control characters, and then the title "Verse 1" or something
-    //After that is the actual song lyrics, but it may be proceeded by one non-word character
-    //Slashes are double escaped here so it can be in a string!
-    const sectionPattern = new RegExp(
-      '^' +
-        this.patternInvisibleCharsStr +
-        '+.{1}' +
-        this.patternInvisibleCharsStr +
-        '+(.+)' +
-        this.patternInvisibleCharsStr +
-        '+\\W*([\\s\\S]+)',
-      'm'
-    );
+      const thisSection: ISongSection = {
+        type: sectionInfo.type,
+        value: sectionContent,
+      };
 
-    //Loop through the sections
-    //But SKIP the first one since it contains the song info we don't need here
-    for (let i = 1; i < sections.length; i++) {
-      const thisSection = sections[i] ?? /* istanbul ignore next */ '';
-      //Run the regex on each section to split out the section title from the lyrics
-      const matches = thisSection.match(sectionPattern);
-      let sectionTitle = '';
-      let sectionLyrics = '';
-
-      //Remove whitespace from the title
-      if (matches != null) {
-        if (matches[1]) {
-          sectionTitle = matches[1].replace(this.patternInvisibleChars, '').trim();
-        }
-        if (matches[2]) {
-          //Remove any more invisible chars from the lyrics and remove whitespace
-          sectionLyrics = matches[2].replace(this.patternInvisibleChars, '').trim();
-        }
-      }
-
-      sectionTitle = this.cleanOddCharsFromSectionTitles(sectionTitle);
-      sectionLyrics = this.cleanOddCharsFromSectionLyrics(sectionLyrics);
-
-      //don't add sections with empty lyrics
-      if (sectionLyrics !== '') {
-        sectionsArray.push({
-          title: sectionTitle,
-          lyrics: sectionLyrics,
-        });
-      }
-    }
-
-    return sectionsArray;
-  }
-
-  private getSectionsAndKeywords(sections: string[]): {
-    sections: ISongShowPlusSection[];
-    keywords: string[];
-  } {
-    const sectionsArray = this.createInitialSectionsArray(sections);
-
-    //The last section also contains the keywords, we need to parse these out separately
-    const lastSectionObj = this.getKeywordsFromLastSection(sections.slice(-1)[0]);
-    let keywords: string[] = [];
-    if (lastSectionObj.lastLyrics !== '') {
-      //If we have no sections, and what we think are keywords are longer than the lyrics...
-      //Then we might need to switch them for some reason...
       if (
-        sectionsArray.length === 0 &&
-        lastSectionObj.keywords.length > lastSectionObj.lastLyrics.length
+        sectionInfo.type === Block.BRIDGE ||
+        sectionInfo.type === Block.CHORUS ||
+        sectionInfo.type === Block.VERSE ||
+        sectionInfo.type === Block.CUSTOM_VERSE
       ) {
-        keywords = [lastSectionObj.lastLyrics];
-
-        sectionsArray.push({
-          title: '',
-          lyrics: lastSectionObj.keywords.join('').replace(/\/+/g, ''),
-        });
-      } else {
-        keywords = lastSectionObj.keywords;
-        if (sectionsArray.length > 0) {
-          const lastSection = sectionsArray.slice(-1)[0];
-          lastSection.lyrics = lastSectionObj.lastLyrics;
-        } else {
-          sectionsArray.push({
-            title: 'All Found Lyrics',
-            lyrics: lastSectionObj.lastLyrics.replace(/\/+/g, ''),
-          });
-        }
+        //extend parsing to look for lyric content
+        thisSection.lyricContent = this.getLyrics(
+          dataView.buffer,
+          byteOffset + sectionInfo.thisBlockLength + 1
+        );
       }
+
+      sections.push(thisSection);
+      // console.log(sectionInfo, Block[sectionInfo.type], sectionContent);
+      byteOffset += sectionInfo.nextBlockStart;
     }
 
-    //Only add it if the title and the lyrics don't match. Sometimes they do for some reason...
-    const finalArray = [];
-    for (const s of sectionsArray) {
-      if (s.title.trim().toLowerCase() !== s.lyrics.trim().toLowerCase()) {
-        finalArray.push(s);
-      }
-    }
+    // console.groupEnd();
+    console.log(sections);
+    return sections;
+  }
+
+  private getLyrics(buffer: ArrayBuffer, lyricStartOffset: number): string {
+    const thisBlockLength = new Uint8Array(buffer.slice(lyricStartOffset, lyricStartOffset + 1))[0];
+    lyricStartOffset++;
+
+    const content = this.processCharsAsString(
+      buffer.slice(lyricStartOffset, lyricStartOffset + thisBlockLength)
+    );
+
+    return content;
+  }
+
+  private getSectionInfo(buffer: ArrayBuffer, byteOffset: number): ISongSectionBufferInfo {
+    const blockLength = 4;
+
+    const type = new Uint32Array(buffer.slice(byteOffset, byteOffset + blockLength))[0];
+    byteOffset += blockLength;
+
+    //subtract 2 to get the next block start position relative to where the data ends, not relative to where the type byte and this byte begin
+    const nextBlockStart =
+      new Uint32Array(buffer.slice(byteOffset, byteOffset + blockLength))[0] - 2;
+    byteOffset += blockLength;
+
+    const numBytesFollows = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
+    byteOffset++;
+
+    //TODO: This might be 4 bytes in some cases!
+    const thisBlockLength = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
+    byteOffset++;
 
     return {
-      sections: finalArray,
-      keywords,
+      type,
+      nextBlockStart,
+      numBytesFollows,
+      thisBlockLength,
+      newByteOffset: byteOffset,
     };
   }
 
-  private getKeywordsFromLastSection(lastSectionRaw: string | undefined): {
-    keywords: string[];
-    lastLyrics: string;
-  } {
-    let keywords: string[] = [];
-    let lastLyrics = '';
+  /**
+   * @description Takes each section as an array of character code numbers and returns the ASCII characters
+   */
+  private processCharsAsString(sectionCharArr: ArrayBuffer): string {
+    // console.groupCollapsed("string");
 
-    if (lastSectionRaw != null) {
-      //Remove all empty items and items that are only 1 character long
-      const infoArray = lastSectionRaw
-        .split(this.patternInvisibleChars)
-        .filter((n: string) => n.trim().length > 1);
+    let txt = '';
+    let offset = 0;
+    const charArr = new Uint8Array(sectionCharArr);
+    while (offset < sectionCharArr.byteLength) {
+      const char = charArr[offset];
+      // console.log(char, String.fromCharCode(char));
+      txt += this.charToAscii(char);
+      offset++;
+    }
+    // console.groupEnd();
 
-      //If we have at least 3 sections, then we have keywords
-      if (infoArray.length > 2) {
-        //The keywords are the entire array except for the first two items
-        keywords = infoArray
-          .splice(2)
-          .map((x) => this.textCleaner.convertWin1252ToUtf8(x.replace(/[\r\n\t]*/g, '')));
+    return this.cleanString(txt);
+  }
 
-        if (infoArray.length > 0 && infoArray[1]) {
-          //Return the last section minus the keywords, then parse out the optional beginning non-word character
-          const lastSectionNonWordsRemoved = /^\W*([\s\S]+)/m.exec(infoArray[1]);
+  /**
+   * @description Takes each section as an array of character code numbers and returns the ASCII characters
+   */
+  private processCharsAsLyricSection(sectionCharArr: Array<number>): ISongShowPlusLyricSection {
+    // console.groupCollapsed("lyrics");
 
-          if (lastSectionNonWordsRemoved?.[1] != null) {
-            lastLyrics = lastSectionNonWordsRemoved[1];
-          }
+    const lyricObj: ISongShowPlusLyricSection = {
+      title: '',
+      lyrics: '',
+    };
+
+    let separatorCount = 0;
+    let offset = 0;
+    while (offset < sectionCharArr.length) {
+      const char = sectionCharArr[offset];
+      // console.log(char, String.fromCharCode(char));
+
+      if (char === 6) {
+        //always a /x06 followed by another character
+        offset += 2;
+        separatorCount++;
+      } else {
+        offset++;
+
+        if (separatorCount <= 1) {
+          lyricObj.title += this.charToAscii(char);
+        } else {
+          lyricObj.lyrics += this.charToAscii(char);
         }
-
-        //Convert characters as needed - useful for non-english alphabets (Spanish)
-        lastLyrics = this.cleanOddCharsFromSectionLyrics(lastLyrics);
       }
     }
+    // console.log("separator count: ", separatorCount);
+    // console.groupEnd();
+
+    //Don't add any if no separators were found
+    if (separatorCount === 0) {
+      lyricObj.title = '';
+      lyricObj.lyrics = '';
+    } else {
+      //Remove ending percent symbols for some reason
+      //Trim any trailing whitespace/newlines
+      lyricObj.title = this.cleanString(lyricObj.title);
+      lyricObj.lyrics = this.cleanString(lyricObj.lyrics);
+    }
+
+    return lyricObj;
+  }
+
+  private processStringAsLyricSection(str: string): ISongShowPlusLyricSection {
+    console.log(str);
 
     return {
-      keywords,
-      lastLyrics,
+      title: '',
+      lyrics: '',
     };
+  }
+
+  //------------------------------------------
+  //Helpers
+  private charToAscii(char: number): string {
+    if (this.charIsPrintableCharacter(char)) {
+      // If the char code is a printable ASCII character, append to output string
+      return String.fromCharCode(char);
+    } else if (char === 10) {
+      // If the char code corresponds to a newline, add a newline character
+      return '\n';
+    }
+    return '';
+  }
+
+  private isSectionSeparator(
+    dataView: DataView,
+    byteOffset: number,
+    totalByteLength: number
+  ): boolean {
+    //\x00\x00\x00\x??\x00\x00\x00
+    //3 null-byte chars, then 1 char, then 3 null-byte chars will separate the sections
+    if (totalByteLength < byteOffset + 6) return false;
+    return (
+      dataView.getInt8(byteOffset) === 0 &&
+      dataView.getInt8(byteOffset + 1) === 0 &&
+      dataView.getInt8(byteOffset + 2) === 0 &&
+      // // + 3 would be a random character
+      dataView.getInt8(byteOffset + 4) === 0 &&
+      dataView.getInt8(byteOffset + 5) === 0 &&
+      dataView.getInt8(byteOffset + 6) === 0
+    );
+  }
+
+  private cleanString(str: string): string {
+    //Remove random ending characters and whitespace
+    return str.replace(/[$%'"]$/, '').trim();
+  }
+
+  private charIsNumber(charCode: number): boolean {
+    //0-9
+    return charCode >= 48 && charCode <= 57;
+  }
+
+  private charIsEnglishLetter(charCode: number): boolean {
+    //A-Za-z
+    return (charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122);
+  }
+
+  private charIsLetter(charCode: number): boolean {
+    //English letters or other non-symbol letter characters
+    return this.charIsEnglishLetter(charCode) || charCode > 192;
+  }
+
+  private charIsPrintableCharacter(char: number): boolean {
+    //letters, numbers, symbols. No control characters or newlines
+    return (
+      this.charIsLetter(char) ||
+      this.charIsNumber(char) ||
+      (char >= 32 && char <= 47) ||
+      (char >= 58 && char <= 64)
+    );
   }
 }
