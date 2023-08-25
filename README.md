@@ -16,19 +16,19 @@ npm install songshowplus-parser --save
 
 ## Usage
 
-Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP7 file as a string to the `.parse()` method.
+Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP7 file as a `Buffer` to the `.parse()` method. Basically you can just pass in the raw output from reading the file without converting it to a string first.
 
 ### For TypeScript projects
 
 ```typescript
 import { readFile } from 'fs';
 import { SongShowPlus } from 'songshowplus-parser';
-import { ISongShowPlusSong } from 'songshowplus-parser/dist/main/model';
+import { ISongShowPlusSong } from 'songshowplus-parser/dist/main/model'; //Add this only If you need the type info
 
 const sspParser = new SongShowPlus();
 
 readFile('Be Near.sbsong', (contents): void => {
-  const song: ISongShowPlusSong = sspParser.parse(contents.toString());
+  const song: ISongShowPlusSong = sspParser.parse(contents);
   console.log(song);
 });
 ```
@@ -42,7 +42,7 @@ const { SongShowPlus } = require('songshowplus-parser');
 const sspParser = new SongShowPlus();
 
 readFile('Be Near.sbsong', (contents) => {
-  const song = sspParser.parse(contents.toString());
+  const song = sspParser.parse(contents);
   console.log(song);
 });
 ```
@@ -53,36 +53,38 @@ Note that for any properties the parser is unable to find an empty string or emp
 
 ```javascript
 {
+  id: '0707',
   title: 'Be Near',
-  keywords: ['Longing', "Security'"],
-  artist: 'Barnard, Shane',
+  author: 'Barnard, Shane',
   copyright: '2003 Waiting Room Music',
   ccli: '4090362',
-  sections: [
+  key: 'B',
+  comments: '',
+  verseOrder: '',
+  songBook: '',
+  songNumber: '',
+  topics: ['Longing', 'Security'],
+  lyricSections: [
     {
       title: 'Chorus 1',
-      lyrics:
-        'Be near O God\r\nBe near O God of us\r\nYour nearness is to us our good\r\nBe near O God\r\nBe near O God of us\r\nYour nearness is to us our good\r\nOur good',
+      lyrics: 'Be near O God\nBe near O God of us\nYour nearness is to us our good\nBe near O God\nBe near O God of us\nYour nearness is to us our good\nOur good',
     },
+    { title: 'Other', lyrics: '' },
     {
       title: 'Verse 1',
-      lyrics:
-        "You are all big and small\r\nBeautiful\r\nAnd wonderful\r\nTo trust in grace through faith\r\nBut I'm asking to taste",
+      lyrics: "You are all big and small\nBeautiful\nAnd wonderful\nTo trust in grace through faith\nBut I'm asking to taste",
     },
     {
       title: 'Verse 2',
-      lyrics:
-        'For dark is light to You\r\nDepths are height to You\r\nFar is near\r\nBut Lord I need to hear from You',
+      lyrics: 'For dark is light to You\nDepths are height to You\nFar is near\nBut Lord I need to hear from You',
     },
     {
       title: 'Verse 3',
-      lyrics:
-        'Your fullness is mine\r\nRevelation divine\r\nBut oh to taste\r\nTo know much more than a page\r\nTo feel Your embrace',
+      lyrics: 'Your fullness is mine\nRevelation divine\nBut oh to taste\nTo know much more than a page\nTo feel Your embrace',
     },
     {
       title: 'Verse 4',
-      lyrics:
-        'For dark is light to You\r\nDepths are height to You\r\nFar is near\r\nBut Lord I need to hear from You',
+      lyrics: 'For dark is light to You\nDepths are height to You\nFar is near\nBut Lord I need to hear from You',
     },
     {
       title: 'Ending',
