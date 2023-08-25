@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+import { CharHelpers } from './char-helpers';
 import { ISongShowPlusLyricSection, ISongShowPlusSong } from './models';
 
 enum Block {
@@ -22,20 +22,30 @@ enum Block {
 interface ISongSectionBufferInfo {
   type: Block;
   nextBlockStart: number;
-  numBytesFollows: number;
-  thisBlockLength: number;
+  blockLength: number;
   newByteOffset: number;
 }
 
+interface IBlockLength {
+  startOffset: number;
+  blockLength: number;
+}
+
 interface ISongSection {
-  type: Block;
-  value: string;
-  lyricContent?: string;
+  bufferInfo: ISongSectionBufferInfo;
+  content: string;
+  lyrics?: string;
 }
 
 export class SongShowPlus {
-  parse(fileBuffer: Buffer): ISongShowPlusSong {
+  private readonly charHelpers = new CharHelpers();
+  private readonly byteLength = 4;
+
+  public parse(fileBuffer: Buffer): ISongShowPlusSong {
     const sections = this.getSections(fileBuffer);
+
+    console.log('==========================================================');
+    console.log(sections);
 
     let songNumber = '';
     let title = '';
@@ -62,11 +72,6 @@ export class SongShowPlus {
     return returnObj;
   }
 
-  //------------------------------------------
-  //File Parsing
-  /**
-   * @description Splits up the file by the separators and returns each section as an array of character code numbers
-   */
   private getSections(fileBuffer: Buffer): Array<ISongSection> {
     /*
     The SongShow Plus song file format is as follows:
@@ -79,6 +84,12 @@ export class SongShowPlus {
         | 1 or 4 Bytes, describes how long the string is, if its 1 byte, the string is less than 255
         | The next bytes are the actual data.
         | The next block of data follows on.
+
+    This description does differ for verses. Which includes extra bytes stating the verse type or number. In some
+    cases a "custom" verse is used, in that case, this block will in include 2 strings, with the associated string
+    length descriptors. The first string is the name of the verse, the second is the verse content.
+
+    The file is ended with four null bytes.
     */
 
     let byteOffset = 0;
@@ -92,217 +103,128 @@ export class SongShowPlus {
     );
     const dataView = new DataView(arrayBuffer);
 
-    console.log('===============================================================');
     // Loop through the buffer and read bytes based on the context
     while (byteOffset < fileBuffer.byteLength) {
-      const sectionInfo = this.getSectionInfo(dataView.buffer, byteOffset);
-      byteOffset = sectionInfo.newByteOffset;
+      //Get the info about the next section
+      const sectionBufferInfo = this.getSectionBufferInfo(dataView.buffer, byteOffset);
+      //Update the current offset to the end of the section we just read
+      byteOffset = sectionBufferInfo.newByteOffset;
 
-      const dataArr = dataView.buffer.slice(byteOffset, byteOffset + sectionInfo.thisBlockLength);
-      const sectionContent = this.processCharsAsString(dataArr);
+      //Using that info we can find the content
+      const dataArr = dataView.buffer.slice(byteOffset, byteOffset + sectionBufferInfo.blockLength);
+      const sectionContent = this.charHelpers.processCharsAsString(dataArr);
 
+      //Create a new object to return with all the relevant info on it
       const thisSection: ISongSection = {
-        type: sectionInfo.type,
-        value: sectionContent,
+        bufferInfo: sectionBufferInfo,
+        content: sectionContent,
       };
 
+      //When a verse is found it only informs us of the location of the title
+      //Right after that is a byte telling us how long the lyric content is,
+      //and then the actual lyric data
       if (
-        sectionInfo.type === Block.BRIDGE ||
-        sectionInfo.type === Block.CHORUS ||
-        sectionInfo.type === Block.VERSE ||
-        sectionInfo.type === Block.CUSTOM_VERSE
+        sectionBufferInfo.type === Block.BRIDGE ||
+        sectionBufferInfo.type === Block.CHORUS ||
+        sectionBufferInfo.type === Block.VERSE ||
+        sectionBufferInfo.type === Block.CUSTOM_VERSE
       ) {
-        //extend parsing to look for lyric content
-        thisSection.lyricContent = this.getLyrics(
+        thisSection.lyrics = this.getLyrics(
           dataView.buffer,
-          byteOffset + sectionInfo.thisBlockLength + 1
+          byteOffset + sectionBufferInfo.blockLength
         );
       }
 
       sections.push(thisSection);
-      // console.log(sectionInfo, Block[sectionInfo.type], sectionContent);
-      byteOffset += sectionInfo.nextBlockStart;
+
+      //Update the byte offset for the next iteration
+      //NOTE: For lyric sections this returns the correct number
+      //even though the content has to be manually found separately
+      byteOffset += sectionBufferInfo.nextBlockStart;
     }
 
-    // console.groupEnd();
-    console.log(sections);
     return sections;
   }
 
   private getLyrics(buffer: ArrayBuffer, lyricStartOffset: number): string {
-    const thisBlockLength = new Uint8Array(buffer.slice(lyricStartOffset, lyricStartOffset + 1))[0];
-    lyricStartOffset++;
+    const blockLengthInfo = this.getBlockLength(buffer, lyricStartOffset);
 
-    const content = this.processCharsAsString(
-      buffer.slice(lyricStartOffset, lyricStartOffset + thisBlockLength)
+    //Get the actual content now that we have the start and end positions
+    const content = this.charHelpers.processCharsAsString(
+      buffer.slice(
+        lyricStartOffset + blockLengthInfo.startOffset,
+        lyricStartOffset + blockLengthInfo.startOffset + blockLengthInfo.blockLength
+      )
     );
 
     return content;
   }
 
-  private getSectionInfo(buffer: ArrayBuffer, byteOffset: number): ISongSectionBufferInfo {
-    const blockLength = 4;
+  private getSectionBufferInfo(buffer: ArrayBuffer, byteOffset: number): ISongSectionBufferInfo {
+    //The first 4 bytes tells us the type. See the Block Enum above to see what they map to
+    //Some data will be returned as unknown types and I have no idea what these are!
+    const type = new Uint32Array(buffer.slice(byteOffset, byteOffset + this.byteLength))[0];
+    byteOffset += this.byteLength;
 
-    const type = new Uint32Array(buffer.slice(byteOffset, byteOffset + blockLength))[0];
-    byteOffset += blockLength;
+    //The next byte tells us where the data for this section ends.
+    // However it includes this and the previous byte in that length, so:
+    // We subtract 2 to get the next block start position relative to where the data ends,
+    // not relative to where the type byte and this byte begin
+    let nextBlockStart =
+      new Uint32Array(buffer.slice(byteOffset, byteOffset + this.byteLength))[0] - 2;
+    byteOffset += this.byteLength;
 
-    //subtract 2 to get the next block start position relative to where the data ends, not relative to where the type byte and this byte begin
-    const nextBlockStart =
-      new Uint32Array(buffer.slice(byteOffset, byteOffset + blockLength))[0] - 2;
-    byteOffset += blockLength;
-
+    //The next byte tells us how many bytes follow this byte
     const numBytesFollows = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
     byteOffset++;
 
-    //TODO: This might be 4 bytes in some cases!
-    const thisBlockLength = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
+    // TODO: We might need to somehow use this here to determine how to get the length
+    // const blockLengthInfo = this.getBlockLength(buffer, byteOffset);
+    // byteOffset += blockLengthInfo.startOffset;
+
+    // If the previous byte was null, the next byte is what actually contains the data we want
+    if (numBytesFollows === 0) {
+      nextBlockStart++;
+      byteOffset++;
+    }
+
+    // TODO: This might be 4 bytes in some cases!
+    const blockLength = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
     byteOffset++;
 
     return {
       type,
       nextBlockStart,
-      numBytesFollows,
-      thisBlockLength,
+      blockLength,
       newByteOffset: byteOffset,
     };
   }
 
-  /**
-   * @description Takes each section as an array of character code numbers and returns the ASCII characters
-   */
-  private processCharsAsString(sectionCharArr: ArrayBuffer): string {
-    // console.groupCollapsed("string");
+  private getBlockLength(buffer: ArrayBuffer, byteOffset: number): IBlockLength {
+    //The first byte will tell us if the next content length is 1 or 4 bytes
+    const byteCount = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1));
 
-    let txt = '';
-    let offset = 0;
-    const charArr = new Uint8Array(sectionCharArr);
-    while (offset < sectionCharArr.byteLength) {
-      const char = charArr[offset];
-      // console.log(char, String.fromCharCode(char));
-      txt += this.charToAscii(char);
-      offset++;
-    }
-    // console.groupEnd();
+    //move forward
+    byteOffset++;
 
-    return this.cleanString(txt);
-  }
+    const contentStartOffset = byteCount[0] === 6 ? 1 : this.byteLength;
 
-  /**
-   * @description Takes each section as an array of character code numbers and returns the ASCII characters
-   */
-  private processCharsAsLyricSection(sectionCharArr: Array<number>): ISongShowPlusLyricSection {
-    // console.groupCollapsed("lyrics");
-
-    const lyricObj: ISongShowPlusLyricSection = {
-      title: '',
-      lyrics: '',
-    };
-
-    let separatorCount = 0;
-    let offset = 0;
-    while (offset < sectionCharArr.length) {
-      const char = sectionCharArr[offset];
-      // console.log(char, String.fromCharCode(char));
-
-      if (char === 6) {
-        //always a /x06 followed by another character
-        offset += 2;
-        separatorCount++;
-      } else {
-        offset++;
-
-        if (separatorCount <= 1) {
-          lyricObj.title += this.charToAscii(char);
-        } else {
-          lyricObj.lyrics += this.charToAscii(char);
-        }
-      }
-    }
-    // console.log("separator count: ", separatorCount);
-    // console.groupEnd();
-
-    //Don't add any if no separators were found
-    if (separatorCount === 0) {
-      lyricObj.title = '';
-      lyricObj.lyrics = '';
+    let nextBlockLength: number;
+    if (contentStartOffset === 1) {
+      //Get the value from the next byte as the content length
+      nextBlockLength = new Uint8Array(
+        buffer.slice(byteOffset, byteOffset + contentStartOffset)
+      )[0];
     } else {
-      //Remove ending percent symbols for some reason
-      //Trim any trailing whitespace/newlines
-      lyricObj.title = this.cleanString(lyricObj.title);
-      lyricObj.lyrics = this.cleanString(lyricObj.lyrics);
+      //get the value from the next 4 bytes as the content length
+      nextBlockLength = new Uint32Array(
+        buffer.slice(byteOffset, byteOffset + contentStartOffset)
+      )[0];
     }
-
-    return lyricObj;
-  }
-
-  private processStringAsLyricSection(str: string): ISongShowPlusLyricSection {
-    console.log(str);
 
     return {
-      title: '',
-      lyrics: '',
+      startOffset: contentStartOffset + 1,
+      blockLength: nextBlockLength,
     };
-  }
-
-  //------------------------------------------
-  //Helpers
-  private charToAscii(char: number): string {
-    if (this.charIsPrintableCharacter(char)) {
-      // If the char code is a printable ASCII character, append to output string
-      return String.fromCharCode(char);
-    } else if (char === 10) {
-      // If the char code corresponds to a newline, add a newline character
-      return '\n';
-    }
-    return '';
-  }
-
-  private isSectionSeparator(
-    dataView: DataView,
-    byteOffset: number,
-    totalByteLength: number
-  ): boolean {
-    //\x00\x00\x00\x??\x00\x00\x00
-    //3 null-byte chars, then 1 char, then 3 null-byte chars will separate the sections
-    if (totalByteLength < byteOffset + 6) return false;
-    return (
-      dataView.getInt8(byteOffset) === 0 &&
-      dataView.getInt8(byteOffset + 1) === 0 &&
-      dataView.getInt8(byteOffset + 2) === 0 &&
-      // // + 3 would be a random character
-      dataView.getInt8(byteOffset + 4) === 0 &&
-      dataView.getInt8(byteOffset + 5) === 0 &&
-      dataView.getInt8(byteOffset + 6) === 0
-    );
-  }
-
-  private cleanString(str: string): string {
-    //Remove random ending characters and whitespace
-    return str.replace(/[$%'"]$/, '').trim();
-  }
-
-  private charIsNumber(charCode: number): boolean {
-    //0-9
-    return charCode >= 48 && charCode <= 57;
-  }
-
-  private charIsEnglishLetter(charCode: number): boolean {
-    //A-Za-z
-    return (charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122);
-  }
-
-  private charIsLetter(charCode: number): boolean {
-    //English letters or other non-symbol letter characters
-    return this.charIsEnglishLetter(charCode) || charCode > 192;
-  }
-
-  private charIsPrintableCharacter(char: number): boolean {
-    //letters, numbers, symbols. No control characters or newlines
-    return (
-      this.charIsLetter(char) ||
-      this.charIsNumber(char) ||
-      (char >= 32 && char <= 47) ||
-      (char >= 58 && char <= 64)
-    );
   }
 }

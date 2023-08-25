@@ -1,6 +1,7 @@
 [![GitHub - release](https://img.shields.io/github/v/release/FiniteLooper/SongShowPlus-parser?style=flat)](https://github.com/FiniteLooper/SongShowPlus-parser/releases/latest)
 
 # SongShowPlus-parser
+
 [SongShow Plus](https://www.songshowplus.com/) is a worship presentation software package use by many churches to present song lyrics (and many other things) on screens. When moving to a different software package it may be needed to get your song lyrics out into some other format.
 
 This project will parses and extract data from SongShow Plus files. It is currently only tested with SongShow Plus 7. I need test files from newer versions to add support.
@@ -14,9 +15,11 @@ npm install songshowplus-parser --save
 ```
 
 ## Usage
+
 Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP7 file as a string to the `.parse()` method.
 
 ### For TypeScript projects
+
 ```typescript
 import { readFile } from 'fs';
 import { SongShowPlus } from 'songshowplus-parser';
@@ -31,6 +34,7 @@ readFile('Be Near.sbsong', (contents): void => {
 ```
 
 ### For JavaScript projects
+
 ```javascript
 const { readFile } = require('fs');
 const { SongShowPlus } = require('songshowplus-parser');
@@ -44,7 +48,9 @@ readFile('Be Near.sbsong', (contents) => {
 ```
 
 ## Example Output
+
 Note that for any properties the parser is unable to find an empty string or empty array will be returned instead. This way all properties are always the types they are supposed to be, nothing is nullable or optional on the returned object.
+
 ```javascript
 {
   title: 'Be Near',
@@ -87,4 +93,5 @@ Note that for any properties the parser is unable to find an empty string or emp
 ```
 
 ## Notes
-SongShow Plus files are in a binary format, which can make them difficult to extract song lyrics from sometimes. The majority of SongShow Plus files are formatted in a similar manner which we can try to figure out, but occasionally there are files with odd formatting. In these cases all the lyrics should be extracted, but it cannot be organized in any way. All I can do in this case is dump all the text onto a single section. In these cases you might have better luck exporting these problem files from SongShow Plus into other formats if possible. This project currently just scrapes out the text it can find, there is probably a more elegant way to accomplish this, but I have not looked into this very much yet.
+
+SongShow Plus files are in a binary format, and I never would have been able to figure this out if it wasn't for [this SSP parser written in python](https://github.com/mhamann/songshow-converter/blob/master/songshowplus.py) by @mhamann
