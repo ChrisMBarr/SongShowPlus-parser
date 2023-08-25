@@ -1,75 +1,25 @@
 import { CharHelpers } from './char-helpers';
-import { ISongShowPlusLyricSection, ISongShowPlusSong } from './models';
-
-enum Block {
-  TITLE = 1,
-  AUTHOR = 2,
-  COPYRIGHT = 3,
-  CCLI_NO = 5,
-  KEY = 11,
-  VERSE = 12,
-  CHORUS = 20,
-  BRIDGE = 24,
-  TOPIC = 29,
-  COMMENTS = 30,
-  VERSE_ORDER = 31,
-  SONG_BOOK = 35,
-  SONG_NUMBER = 36,
-  CUSTOM_VERSE = 37,
-  FILE_START = 38,
-}
-
-interface ISongSectionBufferInfo {
-  type: Block;
-  nextBlockStart: number;
-  blockLength: number;
-  newByteOffset: number;
-}
-
-interface IBlockLength {
-  startOffset: number;
-  blockLength: number;
-}
-
-interface ISongSection {
-  bufferInfo: ISongSectionBufferInfo;
-  content: string;
-  lyrics?: string;
-}
+import {
+  Block,
+  IBlockLength,
+  ISongSection,
+  ISongSectionBufferInfo,
+  SongShowPlusSong,
+} from './models';
 
 export class SongShowPlus {
   private readonly charHelpers = new CharHelpers();
   private readonly byteLength = 4;
 
-  public parse(fileBuffer: Buffer): ISongShowPlusSong {
+  public parse(fileBuffer: Buffer): SongShowPlusSong {
+    // console.log('==========================================================');
     const sections = this.getSections(fileBuffer);
+    // console.log(sections);
 
-    console.log('==========================================================');
-    console.log(sections);
+    const formattedSong = this.getFormattedSong(sections);
+    // console.log(formattedSong);
 
-    let songNumber = '';
-    let title = '';
-    let artist = '';
-    let copyright = '';
-    let ccli = '';
-    let key = '';
-    const keywords: string[] = [];
-    const lyricSections: ISongShowPlusLyricSection[] = [];
-
-    const returnObj: ISongShowPlusSong = {
-      songNumber,
-      title,
-      artist,
-      copyright,
-      ccli,
-      key,
-      keywords,
-      lyricSections,
-    };
-
-    // console.log(returnObj);
-
-    return returnObj;
+    return formattedSong;
   }
 
   private getSections(fileBuffer: Buffer): Array<ISongSection> {
@@ -226,5 +176,59 @@ export class SongShowPlus {
       startOffset: contentStartOffset + 1,
       blockLength: nextBlockLength,
     };
+  }
+
+  // eslint-disable-next-line complexity
+  private getFormattedSong(sections: Array<ISongSection>): SongShowPlusSong {
+    //create a song with defaults
+    const song = new SongShowPlusSong();
+
+    for (const songSection of sections) {
+      switch (songSection.bufferInfo.type) {
+        case Block.FILE_START:
+          song.id = songSection.content;
+          break;
+        case Block.TITLE:
+          song.title = songSection.content;
+          break;
+        case Block.AUTHOR:
+          song.author = songSection.content;
+          break;
+        case Block.COPYRIGHT:
+          song.copyright = songSection.content;
+          break;
+        case Block.CCLI_NO:
+          song.ccli = songSection.content;
+          break;
+        case Block.KEY:
+          song.key = songSection.content;
+          break;
+        case Block.TOPIC:
+          song.topics.push(songSection.content);
+          break;
+        case Block.COMMENTS:
+          song.comments = songSection.content;
+          break;
+        case Block.VERSE_ORDER:
+          song.verseOrder = songSection.content;
+          break;
+        case Block.SONG_BOOK:
+          song.songBook = songSection.content;
+          break;
+        case Block.SONG_NUMBER:
+          song.songNumber = songSection.content;
+          break;
+        case Block.CUSTOM_VERSE:
+        case Block.VERSE:
+        case Block.CHORUS:
+        case Block.BRIDGE:
+          song.lyricSections.push({ title: songSection.content, lyrics: songSection.lyrics! });
+          break;
+        default:
+          break;
+      }
+    }
+
+    return song;
   }
 }

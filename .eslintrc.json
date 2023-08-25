@@ -27,7 +27,7 @@
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": "error",
         "no-use-before-define": "off",
-        "@typescript-eslint/no-non-null-assertion": "error",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-use-before-define": "error",
         "@typescript-eslint/no-unnecessary-qualifier": "error",
         "@typescript-eslint/prefer-readonly": "error",
@@ -39,7 +39,8 @@
         "array-callback-return": "error",
         "complexity": ["error", { "max": 8 }],
         "eqeqeq": ["error", "always", { "null": "ignore" }],
-        "no-unused-vars": "error",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "error",
         "object-shorthand": ["error", "always"],
 
         "eslint-comments/disable-enable-pair": ["error", { "allowWholeFile": true }],
@@ -52,7 +53,6 @@
     {
       "files": ["*.spec.ts", "test/**/*.ts"],
       "rules": {
-        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/explicit-function-return-type": "off"
       }
     }

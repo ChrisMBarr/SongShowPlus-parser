@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { ISongShowPlusSong } from './models';
+import { SongShowPlusSong } from './models';
 import { SongShowPlus } from '.';
 
 describe('SongShowPlus', (): void => {
@@ -17,13 +17,17 @@ describe('SongShowPlus', (): void => {
     const testFile = readFileSync('./sample-files/Be Near.sbsong');
 
     expect(sspParser.parse(testFile)).toEqual({
-      songNumber: '0707',
+      id: '0707',
       title: 'Be Near',
-      artist: 'Barnard, Shane',
+      author: 'Barnard, Shane',
       copyright: '2003 Waiting Room Music',
       ccli: '4090362',
       key: 'B',
-      keywords: ['Longing', 'Security'],
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: ['Longing', 'Security'],
       lyricSections: [
         {
           title: 'Chorus 1',
@@ -56,20 +60,24 @@ describe('SongShowPlus', (): void => {
           lyrics: 'My good',
         },
       ],
-    } as ISongShowPlusSong);
+    } as SongShowPlusSong);
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "Give Us Clean Hands.sbsong"', () => {
     const testFile = readFileSync('./sample-files/Give Us Clean Hands.sbsong');
 
     expect(sspParser.parse(testFile)).toEqual({
-      songNumber: '0707',
+      id: '0707',
       title: 'Give Us Clean Hands',
-      artist: 'Hall, Charlie',
+      author: 'Hall, Charlie',
       copyright: '2000 worshiptogether.com songs',
       ccli: '2060208',
       key: 'Ab',
-      keywords: ['Prayer', 'Repentance'],
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: ['Prayer', 'Repentance'],
       lyricSections: [
         {
           title: 'Chorus 1',
@@ -87,20 +95,24 @@ describe('SongShowPlus', (): void => {
             'We bow our hearts\nwe bend our knees\nOh Spirit come\nmake us humble\nWe turn our eyes\nfrom evil things\nOh Lord we cast\ndown our idols',
         },
       ],
-    } as ISongShowPlusSong);
+    } as SongShowPlusSong);
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "Jesus Saves.sbsong"', () => {
     const testFile = readFileSync('./sample-files/Jesus Saves.sbsong');
 
     expect(sspParser.parse(testFile)).toEqual({
-      songNumber: '0718',
+      id: '0718',
       title: 'Jesus Saves (2)',
-      artist: 'Eddie James',
+      author: 'Eddie James',
       copyright: 'Fresh Wine Publishing',
       ccli: '',
       key: '',
-      keywords: [],
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: [],
       lyricSections: [
         {
           title: 'Verse 1',
@@ -142,20 +154,24 @@ describe('SongShowPlus', (): void => {
           lyrics: 'Jesus saves (repeat) Hallelujah (repeat)',
         },
       ],
-    } as ISongShowPlusSong);
+    } as SongShowPlusSong);
   });
 
   it('should return a song for an ENGLISH SongShow Plus 7 file: "You Are.sbsong"', () => {
     const testFile = readFileSync('./sample-files/You Are.sbsong');
 
     expect(sspParser.parse(testFile)).toEqual({
-      songNumber: '0718',
+      id: '0718',
       title: 'You Are (2)',
-      artist: '8Jobe, Caleb | Cohen, Ezra | Hesami, Josh | Trimble, Paul',
+      author: '8Jobe, Caleb | Cohen, Ezra | Hesami, Josh | Trimble, Paul',
       copyright: '2010 CFN Music',
       ccli: '5715921',
       key: 'C',
-      keywords: ['Appreciation', 'Breakthrough', 'Christ', 'Declaration', 'Jesus'],
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: ['Appreciation', 'Breakthrough', 'Christ', 'Declaration', 'Jesus'],
       lyricSections: [
         {
           title: 'Verse 1',
@@ -178,20 +194,24 @@ describe('SongShowPlus', (): void => {
             "I'm not ashamed of who You are\nYour love broke through\nAnd grace has made me Yours\nNow upon this Rock I stand\nIn victory in victory\n(REPEAT 3X)",
         },
       ],
-    } as ISongShowPlusSong);
+    } as SongShowPlusSong);
   });
 
   it('should return a song for a SPANISH SongShow Plus 7 file: "Devuelveme El Gozo.sbsong"', () => {
     const testFile = readFileSync('./sample-files/Devuelveme El Gozo.sbsong');
 
     expect(sspParser.parse(testFile)).toEqual({
-      songNumber: '0707',
+      id: '0707',
       title: 'Devuelveme El Gozo',
-      artist: '',
+      author: '',
       copyright: '',
       ccli: '',
       key: '',
-      keywords: [],
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: [],
       lyricSections: [
         {
           title: 'Verse 1',
@@ -204,20 +224,24 @@ describe('SongShowPlus', (): void => {
             'Devuelve me el gozo \nDe Tu salvación y\nTu Espíritu noble me sustente \nTe necesito Dios \nSin ti no soy nada \nTe necesito Dios \nDame un nuevo corazón',
         },
       ],
-    } as ISongShowPlusSong);
+    } as SongShowPlusSong);
   });
 
   it('should return a song for a SPANISH SongShow Plus 7 file: "La Sangre (The Blood).sbsong"', () => {
     const testFile = readFileSync('./sample-files/La Sangre (The Blood).sbsong');
 
     expect(sspParser.parse(testFile)).toEqual({
-      songNumber: '0707',
+      id: '0707',
       title: 'La Sangre (The Blood)',
-      artist: '',
+      author: '',
       copyright: '',
       ccli: '',
       key: '',
-      keywords: [],
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: [],
       lyricSections: [
         {
           title: 'Verse 1',
@@ -227,9 +251,9 @@ describe('SongShowPlus', (): void => {
         {
           title: 'Chorus',
           lyrics:
-            'Oh, porque alcanza a limpiar nuestras manchas\ny alcanza a curar nuestras llagas\npecador ven al manantial \nque fluyendo esta\ny lavara tu ser\nporque Cristo nunca perdera su fuerza!!"',
+            'Oh, porque alcanza a limpiar nuestras manchas\ny alcanza a curar nuestras llagas\npecador ven al manantial \nque fluyendo esta\ny lavara tu ser\nporque Cristo nunca perdera su fuerza!!',
         },
       ],
-    } as ISongShowPlusSong);
+    } as SongShowPlusSong);
   });
 });
