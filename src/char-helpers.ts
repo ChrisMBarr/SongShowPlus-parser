@@ -13,13 +13,23 @@ export class CharHelpers {
       offset++;
     }
     // console.groupEnd();
+    return this.cleanString(txt);
+  }
 
+  private cleanString(str: string): string {
     //decode character to UTF-8. Helps with accented characters.
     //This converts things like 'salvaciÃ³n' to 'salvación'
-    return unescape(this.escapeString(txt));
+    return (
+      unescape(this.escapeString(str))
+        //Replace CRLF with a single \n
+        .replace(/\r\n/g, '\n')
+        //remove any trailing whitespace or newlines
+        .trim()
+    );
   }
 
   private escapeString(str: string): string {
+    //A replacement for the deprecated escape method
     //https://stackoverflow.com/a/37303214/79677
     const allowed = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@*_+-./,';
     str = str.toString();
@@ -46,47 +56,4 @@ export class CharHelpers {
     }
     return R;
   }
-
-  // public charToAscii(charCode: number): string {
-  //   // if (this.charIsPrintableCharacter(charCode)) {
-  //   //   // If the char code is a printable ASCII character, append to output string
-
-  //   // } else
-  //   if (charCode === 10) {
-  //     // If the char code corresponds to a newline, add a newline character
-  //     return '\n';
-  //   }
-  //   return String.fromCharCode(charCode);
-  //   // return '';
-  // }
-
-  // public cleanString(str: string): string {
-  //   //Remove random ending characters and whitespace
-  //   return str.replace(/[$%'"]$/, '').trim();
-  // }
-
-  // public charIsNumber(charCode: number): boolean {
-  //   //0-9
-  //   return charCode >= 48 && charCode <= 57;
-  // }
-
-  // public charIsEnglishLetter(charCode: number): boolean {
-  //   //A-Za-z
-  //   return (charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122);
-  // }
-
-  // public charIsLetter(charCode: number): boolean {
-  //   //English letters or other non-symbol letter characters
-  //   return this.charIsEnglishLetter(charCode) || charCode > 192;
-  // }
-
-  // public charIsPrintableCharacter(charCode: number): boolean {
-  //   //letters, numbers, symbols. No control characters or newlines
-  //   return (
-  //     this.charIsLetter(charCode) ||
-  //     this.charIsNumber(charCode) ||
-  //     (charCode >= 32 && charCode <= 47) ||
-  //     (charCode >= 58 && charCode <= 64)
-  //   );
-  // }
 }

@@ -105,7 +105,7 @@ describe('SongShowPlus', (): void => {
       id: '0718',
       title: 'Jesus Saves (2)',
       author: 'Eddie James',
-      copyright: 'Fresh Wine Publishing',
+      copyright: '© Fresh Wine Publishing',
       ccli: '',
       key: '',
       comments: '',
@@ -163,7 +163,7 @@ describe('SongShowPlus', (): void => {
     expect(sspParser.parse(testFile)).toEqual({
       id: '0718',
       title: 'You Are (2)',
-      author: '8Jobe, Caleb | Cohen, Ezra | Hesami, Josh | Trimble, Paul',
+      author: 'Jobe, Caleb | Cohen, Ezra | Hesami, Josh | Trimble, Paul',
       copyright: '2010 CFN Music',
       ccli: '5715921',
       key: 'C',
