@@ -40,6 +40,8 @@ export interface ISongSectionBufferInfo {
   type: Block;
   nextBlockStart: number;
   blockLength: number;
+  readFrom: number;
+  readTo: number;
   newByteOffset: number;
 }
 

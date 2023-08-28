@@ -14,10 +14,10 @@ export class SongShowPlus {
   public parse(fileBuffer: Buffer): SongShowPlusSong {
     // console.log('==========================================================');
     const sections = this.getSections(fileBuffer);
-    // console.log(sections);
+    // console.dir(sections, { depth: null });
 
     const formattedSong = this.getFormattedSong(sections);
-    // console.log(formattedSong);
+    // console.dir(formattedSon, { depth: null });
 
     return formattedSong;
   }
@@ -61,7 +61,7 @@ export class SongShowPlus {
       byteOffset = sectionBufferInfo.newByteOffset;
 
       //Using that info we can find the content
-      const dataArr = dataView.buffer.slice(byteOffset, byteOffset + sectionBufferInfo.blockLength);
+      const dataArr = dataView.buffer.slice(sectionBufferInfo.readFrom, sectionBufferInfo.readTo);
       const sectionContent = this.charHelpers.processCharsAsString(dataArr);
 
       //Create a new object to return with all the relevant info on it
@@ -138,14 +138,35 @@ export class SongShowPlus {
       byteOffset++;
     }
 
-    // TODO: This might be 4 bytes in some cases!
-    const blockLength = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
-    byteOffset++;
+    //
+    let readFrom: number;
+    let readTo: number;
+    let blockLength: number;
+    if (numBytesFollows === 20) {
+      //This is the less common use case
+      //I do not know what the value of 20 represents here
+      //But when we encounter it, it's a full 4 bytes we must move past to get the start of the data
+      //However, the byte offset should not be updated to match this for some reason.
+      //This is why we must provide explicit readFrom and readTo values instead of just reading the offset + the length
+      blockLength = new Uint32Array(buffer.slice(byteOffset, byteOffset + this.byteLength))[0];
+      readFrom = byteOffset + this.byteLength;
+      readTo = byteOffset + blockLength + this.byteLength;
+      byteOffset++;
+    } else {
+      //This is the common use case.
+      //1 byte of blocklength data, and we read from the current offset to the end of the byte length
+      blockLength = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
+      byteOffset++;
+      readFrom = byteOffset;
+      readTo = byteOffset + blockLength;
+    }
 
     return {
       type,
       nextBlockStart,
       blockLength,
+      readFrom,
+      readTo,
       newByteOffset: byteOffset,
     };
   }
