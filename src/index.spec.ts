@@ -256,4 +256,44 @@ describe('SongShowPlus', (): void => {
       ],
     } as SongShowPlusSong);
   });
+
+  it('should return a song for a ENGLISH SongShow Plus 7 file: "a mighty fortress is our god.sbsong"', () => {
+    const testFile = readFileSync('./sample-files/a mighty fortress is our god.sbsong');
+
+    expect(sspParser.parse(testFile)).toEqual({
+      id: '0718',
+      title: 'A Mighty Fortress is our God',
+      author: 'Martin Luther',
+      copyright: 'Public Domain',
+      ccli: 'CCLI No: 12456',
+      key: '',
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: [],
+      lyricSections: [
+        {
+          title: 'Verse 1',
+          lyrics:
+            'A mighty fortress is our God, a bulwark never failing;\nOur helper He, amid the flood of mortal ills prevailing:\nFor still our ancient foe doth seek to work us woe;\nHis craft and power are great, and, armed with cruel hate,\nOn earth is not his equal.',
+        },
+        {
+          title: 'Verse 2',
+          lyrics:
+            'Did we in our own strength confide, our striving would be losing;\nWere not the right Man on our side, the Man of God’s own choosing:\nDost ask who that may be? Christ Jesus, it is He;\nLord Sabaoth, His Name, from age to age the same,\nAnd He must win the battle.',
+        },
+        {
+          title: 'Verse 3',
+          lyrics:
+            'And though this world, with devils filled, should threaten to undo us,\nWe will not fear, for God hath willed His truth to triumph through us:\nThe Prince of Darkness grim, we tremble not for him;\nHis rage we can endure, for lo, his doom is sure,\nOne little word shall fell him.',
+        },
+        {
+          title: 'Verse 4',
+          lyrics:
+            'That word above all earthly powers, no thanks to them, abideth;\nThe Spirit and the gifts are ours through Him Who with us sideth:\nLet goods and kindred go, this mortal life also;\nThe body they may kill: God’s truth abideth still,\nHis kingdom is forever.',
+        },
+      ],
+    } as SongShowPlusSong);
+  });
 });
