@@ -70,15 +70,19 @@ export class SongShowPlus {
         content: sectionContent,
       };
 
-      //When a verse is found it only informs us of the location of the title
-      //Right after that is a byte telling us how long the lyric content is,
-      //and then the actual lyric data
       if (
         sectionBufferInfo.type === Block.BRIDGE ||
         sectionBufferInfo.type === Block.CHORUS ||
-        sectionBufferInfo.type === Block.VERSE ||
-        sectionBufferInfo.type === Block.CUSTOM_VERSE
+        sectionBufferInfo.type === Block.VERSE
       ) {
+        //Inside a built-in song section like these, the content found above is garbage data
+        //we just need to provide meaningful labels here, similar to the ones a custom verse has in the data
+        thisSection.content = this.getBuiltInVerseFriendlyName(sectionBufferInfo.type);
+        thisSection.lyrics = this.getLyrics(dataView.buffer, byteOffset);
+      } else if (sectionBufferInfo.type === Block.CUSTOM_VERSE) {
+        //When a Custom Verse is found it only informs us of the location of the title
+        //Right after that is a byte telling us how long the lyric content is,
+        //and then the actual lyric data
         thisSection.lyrics = this.getLyrics(
           dataView.buffer,
           byteOffset + sectionBufferInfo.blockLength
@@ -94,6 +98,17 @@ export class SongShowPlus {
     }
 
     return sections;
+  }
+
+  private getBuiltInVerseFriendlyName(type: Block): string {
+    if (type === Block.BRIDGE) {
+      return 'Bridge';
+    }
+    if (type === Block.CHORUS) {
+      return 'Chorus';
+    }
+    //Default
+    return 'Verse';
   }
 
   private getLyrics(buffer: ArrayBuffer, lyricStartOffset: number): string {

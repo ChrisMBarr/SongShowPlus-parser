@@ -296,4 +296,89 @@ describe('SongShowPlus', (): void => {
       ],
     } as SongShowPlusSong);
   });
+
+  it('should return a song for a ENGLISH SongShow Plus 7 file: "Amazing Grace.sbsong"', () => {
+    const testFile = readFileSync('./sample-files/Amazing Grace.sbsong');
+
+    expect(sspParser.parse(testFile)).toEqual({
+      id: '',
+      title: 'Amazing Grace (Demonstration)',
+      author: 'Newton, John / Excell, Edwin / Rees, John P.',
+      copyright: 'Public Domain',
+      ccli: '22025',
+      key: 'F  G  Ab',
+      comments: '',
+      verseOrder: '',
+      songBook: 'Demonstration Songs',
+      songNumber: '',
+      topics: ['Assurance', 'Grace', 'Praise', 'Salvation'],
+      lyricSections: [
+        {
+          title: 'Verse',
+          lyrics:
+            'Amazing grace! How sweet the sound!\nThat saved a wretch like me!\nI once was lost, but now am found;\nWas blind, but now I see.',
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "'Twas grace that taught my heart to fear,\nAnd grace my fears relieved.\nHow precious did that grace appear,\nThe hour I first believed.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            'The Lord has promised good to me,\nHis Word my hope secures.\nHe will my shield and portion be\nAs long as life endures.',
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "Thro' many dangers, toils and snares\nI have already come.\n'Tis grace that brought me safe thus far,\nAnd grace will lead me home.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "When we've been there ten thousand years,\nBright shining as the sun,\nWe've no less days to sing God's praise,\nThan when we first begun.",
+        },
+      ],
+    } as SongShowPlusSong);
+  });
+
+  it('should return a song for a ENGLISH SongShow Plus 7 file: "Beautiful Garden Of Prayer.sbsong"', () => {
+    const testFile = readFileSync('./sample-files/Beautiful Garden Of Prayer.sbsong');
+
+    expect(sspParser.parse(testFile)).toEqual({
+      id: '',
+      title: 'Beautiful Garden Of Prayer (Demonstration)',
+      author: 'Schroll, Eleanor Allen / Fillmore, James H.',
+      copyright: 'Public Domain',
+      ccli: '60252',
+      key: 'C  Db D',
+      comments: '',
+      verseOrder: '',
+      songBook: 'Demonstration Songs',
+      songNumber: '',
+      topics: ['Devotion', 'Prayer'],
+      lyricSections: [
+        {
+          title: 'Verse',
+          lyrics:
+            "There's a garden where Jesus is waiting,\nThere's a place that is wondrously fair.\nFor it glows with the light of His presence,\n'Tis the beautiful garden of prayer.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "There's a garden where Jesus is waiting,\nAnd I go with my burden and care.\nJust to learn from His lips, words of comfort,\nIn the beautiful garden of prayer.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "There's a garden where Jesus is waiting,\nAnd He bids you to come meet Him there,\nJust to bow and receive a new blessing,\nIn the beautiful garden of prayer.",
+        },
+        {
+          title: 'Chorus',
+          lyrics:
+            'O the beautiful garden, the garden of prayer,\nO the beautiful garden of prayer.\nThere my Savior awaits, and He opens the gates\nTo the beautiful garden of prayer.',
+        },
+      ],
+    } as SongShowPlusSong);
+  });
 });
