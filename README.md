@@ -4,7 +4,7 @@
 
 [SongShow Plus](https://www.songshowplus.com/) is a worship presentation software package use by many churches to present song lyrics (and many other things) on screens. When moving to a different software package it may be needed to get your song lyrics out into some other format.
 
-This project will parses and extract data from SongShow Plus files. It is currently only tested with SongShow Plus 7. I need test files from newer versions to add support.
+This project will parses and extract data from SongShow Plus files. It is currently only tested with SongShow Plus 7 as far as I know. I need test files from newer versions to be sure. The song files I test against do not contain a version number in them, so perhaps these files are standard across all versions of SongShow Plus, I am not sure. If you have any song files you are able and willing to share with me, I would love to try them.
 
 This project is used by my [LyricConverter](htt://github.com/FiniteLooper/LyricConverter) project which can convert your song lyric files between many common formats. If you need to convert some songs to another existing format I encourage you to check this project out first.
 
@@ -16,7 +16,7 @@ npm install songshowplus-parser --save
 
 ## Usage
 
-Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP7 file as a `Buffer` to the `.parse()` method. Basically you can just pass in the raw output from reading the file without converting it to a string first.
+Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP file as a `Buffer` to the `.parse()` method. Basically you can just pass in the raw output from reading the file without converting it to a string first.
 
 ### For TypeScript projects
 
@@ -47,7 +47,7 @@ readFile('Be Near.sbsong', (contents) => {
 });
 ```
 
-## Example Output
+## Output
 
 Note that for any properties the parser is unable to find an empty string or empty array will be returned instead. This way all properties are always the types they are supposed to be, nothing is nullable or optional on the returned object.
 
