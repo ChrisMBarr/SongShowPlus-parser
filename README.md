@@ -96,4 +96,4 @@ Note that for any properties the parser is unable to find an empty string or emp
 
 ## Notes
 
-SongShow Plus files are in a binary format, and I never would have been able to figure this out if it wasn't for [this SSP parser written in python](https://github.com/mhamann/songshow-converter/blob/master/songshowplus.py) by @mhamann
+SongShow Plus files are in a binary format, and I never would have been able to figure out the meaning of if it wasn't for [this SSP parser written in python](https://github.com/mhamann/songshow-converter/blob/master/songshowplus.py) by [Matt Hamann (@mhamann)](https://github.com/mhamann/) which described the format and structure of these files. I have no idea how he figured it out, but I'm glad he did!
