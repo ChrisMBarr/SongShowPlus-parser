@@ -16,7 +16,7 @@ npm install songshowplus-parser --save
 
 ## Usage
 
-Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP file as a `Buffer` to the `.parse()` method. Basically you can just pass in the raw output from reading the file without converting it to a string first.
+Simply import and create a new instance of `SongShowPlus`, then pass the contents of a SSP file as a `Buffer` or an `ArrayBuffer` to the `.parse()` method. Basically you can just pass in the raw output from reading the file without converting it to a string first. If you are using a `FileReader` be sure to use the `readAsArrayBuffer(yourFile)` method
 
 ### For TypeScript projects
 

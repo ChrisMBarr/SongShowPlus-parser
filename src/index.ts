@@ -11,18 +11,30 @@ export class SongShowPlus {
   private readonly charHelpers = new CharHelpers();
   private readonly byteLength = 4;
 
-  public parse(fileBuffer: Buffer): SongShowPlusSong {
+  public parse(rawBuffer: Buffer | ArrayBuffer | ArrayBufferLike): SongShowPlusSong {
     // console.log('==========================================================');
+    let fileBuffer: ArrayBuffer;
+    if (Buffer.isBuffer(rawBuffer)) {
+      //Convert Node Buffer to an array buffer
+      //https://stackoverflow.com/a/71211814/79677
+      fileBuffer = rawBuffer.buffer.slice(
+        rawBuffer.byteOffset,
+        rawBuffer.byteOffset + rawBuffer.byteLength
+      );
+    } else {
+      fileBuffer = rawBuffer;
+    }
+
     const sections = this.getSections(fileBuffer);
     // console.dir(sections, { depth: null });
 
     const formattedSong = this.getFormattedSong(sections);
-    // console.dir(formattedSon, { depth: null });
+    // console.dir(formattedSong, { depth: null });
 
     return formattedSong;
   }
 
-  private getSections(fileBuffer: Buffer): Array<ISongSection> {
+  private getSections(arrayBuffer: ArrayBuffer): Array<ISongSection> {
     /*
     The SongShow Plus song file format is as follows:
 
@@ -45,23 +57,15 @@ export class SongShowPlus {
     let byteOffset = 0;
     const sections: Array<ISongSection> = [];
 
-    //Convert Node Buffer to an array buffer
-    //https://stackoverflow.com/a/71211814/79677
-    const arrayBuffer = fileBuffer.buffer.slice(
-      fileBuffer.byteOffset,
-      fileBuffer.byteOffset + fileBuffer.byteLength
-    );
-    const dataView = new DataView(arrayBuffer);
-
     // Loop through the buffer and read bytes based on the context
-    while (byteOffset < fileBuffer.byteLength) {
+    while (byteOffset < arrayBuffer.byteLength) {
       //Get the info about the next section
-      const sectionBufferInfo = this.getSectionBufferInfo(dataView.buffer, byteOffset);
+      const sectionBufferInfo = this.getSectionBufferInfo(arrayBuffer, byteOffset);
       //Update the current offset to the end of the section we just read
       byteOffset = sectionBufferInfo.newByteOffset;
 
       //Using that info we can find the content
-      const dataArr = dataView.buffer.slice(sectionBufferInfo.readFrom, sectionBufferInfo.readTo);
+      const dataArr = arrayBuffer.slice(sectionBufferInfo.readFrom, sectionBufferInfo.readTo);
       const sectionContent = this.charHelpers.processCharsAsString(dataArr);
 
       //Create a new object to return with all the relevant info on it
@@ -78,13 +82,13 @@ export class SongShowPlus {
         //Inside a built-in song section like these, the content found above is garbage data
         //we just need to provide meaningful labels here, similar to the ones a custom verse has in the data
         thisSection.content = this.getBuiltInVerseFriendlyName(sectionBufferInfo.type);
-        thisSection.lyrics = this.getLyrics(dataView.buffer, byteOffset);
+        thisSection.lyrics = this.getLyrics(arrayBuffer, byteOffset);
       } else if (sectionBufferInfo.type === Block.CUSTOM_VERSE) {
         //When a Custom Verse is found it only informs us of the location of the title
         //Right after that is a byte telling us how long the lyric content is,
         //and then the actual lyric data
         thisSection.lyrics = this.getLyrics(
-          dataView.buffer,
+          arrayBuffer,
           byteOffset + sectionBufferInfo.blockLength
         );
       }
