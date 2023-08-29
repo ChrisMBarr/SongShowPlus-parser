@@ -197,6 +197,131 @@ describe('SongShowPlus', (): void => {
     } as SongShowPlusSong);
   });
 
+  it('should return a song for an ENGLISH SongShow Plus 7 file: "a mighty fortress is our god.sbsong"', () => {
+    const testFile = readFileSync('./sample-files/a mighty fortress is our god.sbsong');
+
+    expect(sspParser.parse(testFile)).toEqual({
+      id: '0718',
+      title: 'A Mighty Fortress is our God',
+      author: 'Martin Luther',
+      copyright: 'Public Domain',
+      ccli: 'CCLI No: 12456',
+      key: '',
+      comments: '',
+      verseOrder: '',
+      songBook: '',
+      songNumber: '',
+      topics: [],
+      lyricSections: [
+        {
+          title: 'Verse 1',
+          lyrics:
+            'A mighty fortress is our God, a bulwark never failing;\nOur helper He, amid the flood of mortal ills prevailing:\nFor still our ancient foe doth seek to work us woe;\nHis craft and power are great, and, armed with cruel hate,\nOn earth is not his equal.',
+        },
+        {
+          title: 'Verse 2',
+          lyrics:
+            'Did we in our own strength confide, our striving would be losing;\nWere not the right Man on our side, the Man of God’s own choosing:\nDost ask who that may be? Christ Jesus, it is He;\nLord Sabaoth, His Name, from age to age the same,\nAnd He must win the battle.',
+        },
+        {
+          title: 'Verse 3',
+          lyrics:
+            'And though this world, with devils filled, should threaten to undo us,\nWe will not fear, for God hath willed His truth to triumph through us:\nThe Prince of Darkness grim, we tremble not for him;\nHis rage we can endure, for lo, his doom is sure,\nOne little word shall fell him.',
+        },
+        {
+          title: 'Verse 4',
+          lyrics:
+            'That word above all earthly powers, no thanks to them, abideth;\nThe Spirit and the gifts are ours through Him Who with us sideth:\nLet goods and kindred go, this mortal life also;\nThe body they may kill: God’s truth abideth still,\nHis kingdom is forever.',
+        },
+      ],
+    } as SongShowPlusSong);
+  });
+
+  it('should return a song for an ENGLISH SongShow Plus 7 file: "Amazing Grace.sbsong"', () => {
+    const testFile = readFileSync('./sample-files/Amazing Grace.sbsong');
+
+    expect(sspParser.parse(testFile)).toEqual({
+      id: '',
+      title: 'Amazing Grace (Demonstration)',
+      author: 'Newton, John / Excell, Edwin / Rees, John P.',
+      copyright: 'Public Domain',
+      ccli: '22025',
+      key: 'F  G  Ab',
+      comments: '',
+      verseOrder: '',
+      songBook: 'Demonstration Songs',
+      songNumber: '',
+      topics: ['Assurance', 'Grace', 'Praise', 'Salvation'],
+      lyricSections: [
+        {
+          title: 'Verse',
+          lyrics:
+            'Amazing grace! How sweet the sound!\nThat saved a wretch like me!\nI once was lost, but now am found;\nWas blind, but now I see.',
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "'Twas grace that taught my heart to fear,\nAnd grace my fears relieved.\nHow precious did that grace appear,\nThe hour I first believed.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            'The Lord has promised good to me,\nHis Word my hope secures.\nHe will my shield and portion be\nAs long as life endures.',
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "Thro' many dangers, toils and snares\nI have already come.\n'Tis grace that brought me safe thus far,\nAnd grace will lead me home.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "When we've been there ten thousand years,\nBright shining as the sun,\nWe've no less days to sing God's praise,\nThan when we first begun.",
+        },
+      ],
+    } as SongShowPlusSong);
+  });
+
+  it('should return a song for an ENGLISH SongShow Plus 7 file: "Beautiful Garden Of Prayer.sbsong"', () => {
+    const testFile = readFileSync('./sample-files/Beautiful Garden Of Prayer.sbsong');
+
+    expect(sspParser.parse(testFile)).toEqual({
+      id: '',
+      title: 'Beautiful Garden Of Prayer (Demonstration)',
+      author: 'Schroll, Eleanor Allen / Fillmore, James H.',
+      copyright: 'Public Domain',
+      ccli: '60252',
+      key: 'C  Db D',
+      comments: '',
+      verseOrder: '',
+      songBook: 'Demonstration Songs',
+      songNumber: '',
+      topics: ['Devotion', 'Prayer'],
+      lyricSections: [
+        {
+          title: 'Verse',
+          lyrics:
+            "There's a garden where Jesus is waiting,\nThere's a place that is wondrously fair.\nFor it glows with the light of His presence,\n'Tis the beautiful garden of prayer.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "There's a garden where Jesus is waiting,\nAnd I go with my burden and care.\nJust to learn from His lips, words of comfort,\nIn the beautiful garden of prayer.",
+        },
+        {
+          title: 'Verse',
+          lyrics:
+            "There's a garden where Jesus is waiting,\nAnd He bids you to come meet Him there,\nJust to bow and receive a new blessing,\nIn the beautiful garden of prayer.",
+        },
+        {
+          title: 'Chorus',
+          lyrics:
+            'O the beautiful garden, the garden of prayer,\nO the beautiful garden of prayer.\nThere my Savior awaits, and He opens the gates\nTo the beautiful garden of prayer.',
+        },
+      ],
+    } as SongShowPlusSong);
+  });
+
   it('should return a song for a SPANISH SongShow Plus 7 file: "Devuelveme El Gozo.sbsong"', () => {
     const testFile = readFileSync('./sample-files/Devuelveme El Gozo.sbsong');
 
@@ -252,131 +377,6 @@ describe('SongShowPlus', (): void => {
           title: 'Chorus',
           lyrics:
             'Oh, porque alcanza a limpiar nuestras manchas\ny alcanza a curar nuestras llagas\npecador ven al manantial \nque fluyendo esta\ny lavara tu ser\nporque Cristo nunca perdera su fuerza!!',
-        },
-      ],
-    } as SongShowPlusSong);
-  });
-
-  it('should return a song for a ENGLISH SongShow Plus 7 file: "a mighty fortress is our god.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/a mighty fortress is our god.sbsong');
-
-    expect(sspParser.parse(testFile)).toEqual({
-      id: '0718',
-      title: 'A Mighty Fortress is our God',
-      author: 'Martin Luther',
-      copyright: 'Public Domain',
-      ccli: 'CCLI No: 12456',
-      key: '',
-      comments: '',
-      verseOrder: '',
-      songBook: '',
-      songNumber: '',
-      topics: [],
-      lyricSections: [
-        {
-          title: 'Verse 1',
-          lyrics:
-            'A mighty fortress is our God, a bulwark never failing;\nOur helper He, amid the flood of mortal ills prevailing:\nFor still our ancient foe doth seek to work us woe;\nHis craft and power are great, and, armed with cruel hate,\nOn earth is not his equal.',
-        },
-        {
-          title: 'Verse 2',
-          lyrics:
-            'Did we in our own strength confide, our striving would be losing;\nWere not the right Man on our side, the Man of God’s own choosing:\nDost ask who that may be? Christ Jesus, it is He;\nLord Sabaoth, His Name, from age to age the same,\nAnd He must win the battle.',
-        },
-        {
-          title: 'Verse 3',
-          lyrics:
-            'And though this world, with devils filled, should threaten to undo us,\nWe will not fear, for God hath willed His truth to triumph through us:\nThe Prince of Darkness grim, we tremble not for him;\nHis rage we can endure, for lo, his doom is sure,\nOne little word shall fell him.',
-        },
-        {
-          title: 'Verse 4',
-          lyrics:
-            'That word above all earthly powers, no thanks to them, abideth;\nThe Spirit and the gifts are ours through Him Who with us sideth:\nLet goods and kindred go, this mortal life also;\nThe body they may kill: God’s truth abideth still,\nHis kingdom is forever.',
-        },
-      ],
-    } as SongShowPlusSong);
-  });
-
-  it('should return a song for a ENGLISH SongShow Plus 7 file: "Amazing Grace.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/Amazing Grace.sbsong');
-
-    expect(sspParser.parse(testFile)).toEqual({
-      id: '',
-      title: 'Amazing Grace (Demonstration)',
-      author: 'Newton, John / Excell, Edwin / Rees, John P.',
-      copyright: 'Public Domain',
-      ccli: '22025',
-      key: 'F  G  Ab',
-      comments: '',
-      verseOrder: '',
-      songBook: 'Demonstration Songs',
-      songNumber: '',
-      topics: ['Assurance', 'Grace', 'Praise', 'Salvation'],
-      lyricSections: [
-        {
-          title: 'Verse',
-          lyrics:
-            'Amazing grace! How sweet the sound!\nThat saved a wretch like me!\nI once was lost, but now am found;\nWas blind, but now I see.',
-        },
-        {
-          title: 'Verse',
-          lyrics:
-            "'Twas grace that taught my heart to fear,\nAnd grace my fears relieved.\nHow precious did that grace appear,\nThe hour I first believed.",
-        },
-        {
-          title: 'Verse',
-          lyrics:
-            'The Lord has promised good to me,\nHis Word my hope secures.\nHe will my shield and portion be\nAs long as life endures.',
-        },
-        {
-          title: 'Verse',
-          lyrics:
-            "Thro' many dangers, toils and snares\nI have already come.\n'Tis grace that brought me safe thus far,\nAnd grace will lead me home.",
-        },
-        {
-          title: 'Verse',
-          lyrics:
-            "When we've been there ten thousand years,\nBright shining as the sun,\nWe've no less days to sing God's praise,\nThan when we first begun.",
-        },
-      ],
-    } as SongShowPlusSong);
-  });
-
-  it('should return a song for a ENGLISH SongShow Plus 7 file: "Beautiful Garden Of Prayer.sbsong"', () => {
-    const testFile = readFileSync('./sample-files/Beautiful Garden Of Prayer.sbsong');
-
-    expect(sspParser.parse(testFile)).toEqual({
-      id: '',
-      title: 'Beautiful Garden Of Prayer (Demonstration)',
-      author: 'Schroll, Eleanor Allen / Fillmore, James H.',
-      copyright: 'Public Domain',
-      ccli: '60252',
-      key: 'C  Db D',
-      comments: '',
-      verseOrder: '',
-      songBook: 'Demonstration Songs',
-      songNumber: '',
-      topics: ['Devotion', 'Prayer'],
-      lyricSections: [
-        {
-          title: 'Verse',
-          lyrics:
-            "There's a garden where Jesus is waiting,\nThere's a place that is wondrously fair.\nFor it glows with the light of His presence,\n'Tis the beautiful garden of prayer.",
-        },
-        {
-          title: 'Verse',
-          lyrics:
-            "There's a garden where Jesus is waiting,\nAnd I go with my burden and care.\nJust to learn from His lips, words of comfort,\nIn the beautiful garden of prayer.",
-        },
-        {
-          title: 'Verse',
-          lyrics:
-            "There's a garden where Jesus is waiting,\nAnd He bids you to come meet Him there,\nJust to bow and receive a new blessing,\nIn the beautiful garden of prayer.",
-        },
-        {
-          title: 'Chorus',
-          lyrics:
-            'O the beautiful garden, the garden of prayer,\nO the beautiful garden of prayer.\nThere my Savior awaits, and He opens the gates\nTo the beautiful garden of prayer.',
         },
       ],
     } as SongShowPlusSong);
