@@ -23,7 +23,7 @@ Simply import and create a new instance of `SongShowPlus`, then pass the content
 ```typescript
 import { readFile } from 'fs';
 import { SongShowPlus } from 'songshowplus-parser';
-import { ISongShowPlusSong } from 'songshowplus-parser/dist/main/model'; //Add this only If you need the type info
+import { ISongShowPlusSong } from 'songshowplus-parser/dist/main/model'; //Add only if you need the type defs
 
 const sspParser = new SongShowPlus();
 

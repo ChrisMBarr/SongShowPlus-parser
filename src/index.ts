@@ -4,7 +4,7 @@ import {
   ISongSection,
   ISongSectionBufferInfo,
   SongShowPlusSong,
-} from './models';
+} from './model';
 
 export class SongShowPlus {
   private readonly byteLength = 4;

@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { SongShowPlusSong } from './models';
+import { SongShowPlusSong } from './model';
 import { SongShowPlus } from '.';
 
 describe('SongShowPlus', (): void => {

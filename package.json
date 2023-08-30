@@ -1,6 +1,6 @@
 {
   "name": "songshowplus-parser",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Parses and extracts data from SongShow Plus files",
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
@@ -27,7 +27,6 @@
     "dist/module",
     "!**/*.spec.*",
     "!**/*.json",
-    "!**/models.js",
     "!**/*.tsbuildinfo*",
     "LICENSE",
     "README.md"
