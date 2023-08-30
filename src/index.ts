@@ -1,4 +1,3 @@
-import { CharHelpers } from './char-helpers';
 import {
   Block,
   IBlockLength,
@@ -8,8 +7,8 @@ import {
 } from './models';
 
 export class SongShowPlus {
-  private readonly charHelpers = new CharHelpers();
   private readonly byteLength = 4;
+  private readonly utf8Decoder = new TextDecoder('utf-8');
 
   public parse(rawBuffer: Buffer | ArrayBuffer | ArrayBufferLike): SongShowPlusSong {
     // console.log('==========================================================');
@@ -66,7 +65,7 @@ export class SongShowPlus {
 
       //Using that info we can find the content
       const dataArr = arrayBuffer.slice(sectionBufferInfo.readFrom, sectionBufferInfo.readTo);
-      const sectionContent = this.charHelpers.processCharsAsString(dataArr);
+      const sectionContent = this.processCharsAsString(dataArr);
 
       //Create a new object to return with all the relevant info on it
       const thisSection: ISongSection = {
@@ -119,7 +118,7 @@ export class SongShowPlus {
     const blockLengthInfo = this.getBlockLength(buffer, lyricStartOffset);
 
     //Get the actual content now that we have the start and end positions
-    const content = this.charHelpers.processCharsAsString(
+    const content = this.processCharsAsString(
       buffer.slice(
         lyricStartOffset + blockLengthInfo.startOffset,
         lyricStartOffset + blockLengthInfo.startOffset + blockLengthInfo.blockLength
@@ -173,7 +172,7 @@ export class SongShowPlus {
       byteOffset++;
     } else {
       //This is the common use case.
-      //1 byte of blocklength data, and we read from the current offset to the end of the byte length
+      //1 byte of block length data, and we read from the current offset to the end of the byte length
       blockLength = new Uint8Array(buffer.slice(byteOffset, byteOffset + 1))[0];
       byteOffset++;
       readFrom = byteOffset;
@@ -270,5 +269,20 @@ export class SongShowPlus {
     }
 
     return song;
+  }
+
+  private processCharsAsString(sectionCharArr: ArrayBuffer): string {
+    //decode character to UTF-8. Helps with accented characters.
+    //This converts things like 'salvaciÃ³n' to 'salvación'
+    const charArr = new Uint8Array(sectionCharArr);
+
+    return (
+      this.utf8Decoder
+        .decode(charArr)
+        //Replace CRLF with a single \n
+        .replace(/\r\n/g, '\n')
+        //remove any trailing whitespace or newlines
+        .trim()
+    );
   }
 }
