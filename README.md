@@ -6,7 +6,7 @@
 
 This project will parses and extract data from SongShow Plus files. It is currently only tested with SongShow Plus 7 as far as I know. I need test files from newer versions to be sure. The song files I test against do not contain a version number in them, so perhaps these files are standard across all versions of SongShow Plus, I am not sure. If you have any song files you are able and willing to share with me, I would love to try them.
 
-This project is used by my [LyricConverter](htt://github.com/FiniteLooper/LyricConverter) project which can convert your song lyric files between many common formats. If you need to convert some songs to another existing format I encourage you to check this project out first.
+This project is used by my [LyricConverter](https://github.com/FiniteLooper/LyricConverter) project which can convert your song lyric files between many common formats. If you need to convert some songs to another existing format I encourage you to check that project out first.
 
 ## Installation
 
