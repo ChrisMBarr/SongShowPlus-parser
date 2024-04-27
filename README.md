@@ -1,12 +1,12 @@
-[![GitHub - release](https://img.shields.io/github/v/release/FiniteLooper/SongShowPlus-parser?style=flat)](https://github.com/FiniteLooper/SongShowPlus-parser/releases/latest)
+[![GitHub - release](https://img.shields.io/github/v/release/ChrisMBarr/SongShowPlus-parser?style=flat)](https://github.com/ChrisMBarr/SongShowPlus-parser/releases/latest)
 
 # SongShowPlus-parser
 
 [SongShow Plus](https://www.songshowplus.com/) is a worship presentation software package use by many churches to present song lyrics (and many other things) on screens. When moving to a different software package it may be needed to get your song lyrics out into some other format.
 
-This project will parse and extract data from SongShow Plus `*.sbsong` files, you can find [sample files in this repo](https://github.com/FiniteLooper/SongShowPlus-parser/tree/main/sample-files) if you need to see what this can work with. It has **only been tested with SongShow Plus 7 files** as far as I know. I need test files from newer versions to be sure. The song files I test against do not contain a version number in them, so perhaps these files are standard across all versions of SongShow Plus, I am not sure. **If you have any song files you are able and willing to share with me, I would love to try them!**
+This project will parse and extract data from SongShow Plus `*.sbsong` files, you can find [sample files in this repo](https://github.com/ChrisMBarr/SongShowPlus-parser/tree/main/sample-files) if you need to see what this can work with. It has **only been tested with SongShow Plus 7 files** as far as I know. I need test files from newer versions to be sure. The song files I test against do not contain a version number in them, so perhaps these files are standard across all versions of SongShow Plus, I am not sure. **If you have any song files you are able and willing to share with me, I would love to try them!**
 
-This project is used by my [LyricConverter](https://github.com/FiniteLooper/LyricConverter) project which can convert your song lyric files between many common formats. If you need to convert some songs to another existing format I encourage you to check that project out first.
+This project is used by my [LyricConverter](https://github.com/ChrisMBarr/LyricConverter) project which can convert your song lyric files between many common formats. If you need to convert some songs to another existing format I encourage you to check that project out first.
 
 ## Installation
 

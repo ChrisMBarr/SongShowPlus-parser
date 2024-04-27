@@ -5,13 +5,13 @@
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
   "module": "dist/module/index.js",
-  "homepage": "https://github.com/FiniteLooper/SongShowPlus-parser#readme",
+  "homepage": "https://github.com/ChrisMBarr/SongShowPlus-parser#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FiniteLooper/SongShowPlus-parser.git"
+    "url": "git+https://github.com/ChrisMBarr/SongShowPlus-parser.git"
   },
   "bugs": {
-    "url": "https://github.com/FiniteLooper/SongShowPlus-parser/issues"
+    "url": "https://github.com/ChrisMBarr/SongShowPlus-parser/issues"
   },
   "keywords": [
     "church",
