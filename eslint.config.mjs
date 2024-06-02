@@ -37,9 +37,8 @@ export default tseslint.config(
       '@typescript-eslint/strict-boolean-expressions': 'warn',
 
       'array-callback-return': 'warn',
-      complexity: ['warn', { max: 8 }],
+      complexity: ['warn', { max: 6 }],
       eqeqeq: ['warn', 'always', { null: 'ignore' }],
-      'no-unused-vars': 'warn',
       'object-shorthand': ['warn', 'always'],
 
       'simple-import-sort/imports': 'warn',

@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
-import { SongShowPlusSong } from './model';
+
 import { SongShowPlus } from '.';
+import { SongShowPlusSong } from './model';
 
 describe('SongShowPlus', (): void => {
   let sspParser: SongShowPlus;

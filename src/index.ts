@@ -262,6 +262,7 @@ export class SongShowPlus {
         case Block.VERSE:
         case Block.CHORUS:
         case Block.BRIDGE:
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- For these types of blocks we know there will be lyrics, so this rule is OK to disable here
           song.lyricSections.push({ title: songSection.content, lyrics: songSection.lyrics! });
           break;
         default:
