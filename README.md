@@ -47,6 +47,17 @@ readFile('Be Near.sbsong', (contents) => {
 });
 ```
 
+### Browser Usage
+
+If you plan on using this in a web browser instead of node, `Buffer` might not be available and you'll have to add a package to handle this
+First run `npm install buffer --save` and then import it and assign it to `window` like this
+
+```ts
+import { Buffer } from 'buffer';
+
+window.Buffer = Buffer; // Needed for SongShowPlus-Parser
+```
+
 ## Output
 
 Note that for any properties the parser is unable to find an empty string or empty array will be returned instead. This way all properties are always the types they are supposed to be, nothing is nullable or optional on the returned object.
