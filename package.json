@@ -1,6 +1,6 @@
 {
   "name": "songshowplus-parser",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Parses and extracts data from SongShow Plus files",
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
@@ -82,16 +82,16 @@
     "watch:test:html": "jest --watch --reporters=jest-html-reporter --verbose=false"
   },
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
+    "@eslint/js": "^9.33.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "eslint": "^9.32.0",
+    "eslint": "^9.33.0",
     "jest-html-reporter": "^4.3.0",
     "jest": "^30.0.5",
-    "ts-jest": "^29.4.0",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
-    "typescript-eslint": "^8.38.0",
-    "typescript": "^5.8.3"
+    "typescript-eslint": "^8.39.0",
+    "typescript": "^5.9.2"
   }
 }

@@ -10,19 +10,19 @@ export class SongShowPlus {
   private readonly byteLength = 4;
   private readonly utf8Decoder = new TextDecoder('utf-8');
 
-  public parse(rawBuffer: Buffer | ArrayBuffer | ArrayBufferLike): SongShowPlusSong {
+  public parse(rawBuffer: Buffer | ArrayBuffer): SongShowPlusSong {
     // console.log('==========================================================');
     let fileBuffer: ArrayBuffer;
     //The Node Buffer is not available in web browsers, so we want to make sure it exists before attempting to use it
-    if (typeof Buffer !== 'undefined' && Buffer.isBuffer(rawBuffer)) {
+    if (Buffer?.isBuffer(rawBuffer)) {
       //Convert Node Buffer to an array buffer
       //https://stackoverflow.com/a/71211814/79677
       fileBuffer = rawBuffer.buffer.slice(
         rawBuffer.byteOffset,
         rawBuffer.byteOffset + rawBuffer.byteLength
-      );
+      ) as ArrayBuffer;
     } else {
-      fileBuffer = rawBuffer;
+      fileBuffer = rawBuffer as ArrayBuffer;
     }
 
     const sections = this.getSections(fileBuffer);
