@@ -84,7 +84,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.8.1",
+    "@types/node": "^24.10.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint": "^9.39.0",
     "jest-html-reporter": "^4.3.0",
